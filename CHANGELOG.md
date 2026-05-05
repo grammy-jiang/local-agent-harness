@@ -17,3 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `setup` auto-detects which agent skill roots exist
   (`~/.claude/skills`, `~/.copilot/skills`, `~/.codex/skills`) and only
   installs into those; `--target PATH` overrides.
+
+### Publish notes
+
+To publish to PyPI:
+
+1. Configure a trusted publisher on PyPI for this repo and the
+   `publish.yml` workflow (one-time): see
+   <https://docs.pypi.org/trusted-publishers/>.
+2. `git tag v0.1.0 && git push origin v0.1.0`.
+3. Cut a GitHub release for that tag → `publish.yml` runs and uploads.
+
+For a manual one-off publish:
+
+```bash
+uv build
+uv publish    # uses UV_PUBLISH_TOKEN or trusted publisher
+```
