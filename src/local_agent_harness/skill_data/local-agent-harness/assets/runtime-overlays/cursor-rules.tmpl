@@ -1,0 +1,21 @@
+# .cursor/rules — Cursor overlay
+#
+# Specializes AGENTS.md for Cursor agents. Never relaxes GROUNDING.md.
+
+## Always
+- Read `AGENTS.md` and `GROUNDING.md` before any edit.
+- Update `.agent/plan.md` before edits.
+- Respect path allowlist in `AGENTS.md`.
+
+## Never
+- Write to paths outside the allowlist.
+- Run destructive commands without explicit user confirmation.
+- Send red-class data to any tool, log, or model.
+
+## Tools
+- Prefer `Edit` (patch) over full-file rewrites.
+- Use `Search` before `Read` to minimize context use.
+
+## Verification
+- Run lint + tests before declaring done.
+- Append a `Decisions log` entry for each non-trivial decision.

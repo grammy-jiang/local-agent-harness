@@ -1,0 +1,25 @@
+# CLAUDE.md — Claude Code overlay
+
+> Specializes `AGENTS.md` for Claude Code. Never relaxes `GROUNDING.md`.
+
+## Permission ladder (Claude Code)
+- Default mode: `<plan | default | accept-edits>`
+- Tools enabled: `Read`, `Glob`, `Grep`, `Edit`, `Bash` (allowlisted).
+- Tools disabled: `<list>`
+- MCP servers: `<list with version pins>`
+
+## Plan mode
+- Required for: cross-cutting refactors, dependency upgrades, schema changes.
+- Triggered by phrases: "refactor", "upgrade", "migrate", "redesign".
+
+## Skills
+- Repository skills live under `.skills/*.SKILL.md`.
+- Skills are lazy-loaded; do not pre-load all skills.
+
+## Compaction
+- Compact at 70 % of context.
+- Always retain: `AGENTS.md`, current `plan.md`, last 5 tool calls, open diff.
+
+## Stop conditions specific to Claude Code
+- If a tool call fails 3× consecutively, stop and ask.
+- If `accept-edits` writes outside scope, abort and revert.

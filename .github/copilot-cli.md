@@ -1,0 +1,21 @@
+# .github/copilot-cli.md — GitHub Copilot CLI overlay
+#
+# Specializes AGENTS.md for Copilot CLI. Never relaxes GROUNDING.md.
+
+## Permission posture
+- Default: confirm before destructive actions.
+- Branch protection: required on `main`.
+- Sandbox: rely on devcontainer; do not run on host for untrusted repos.
+
+## Tool surface
+- Read/search/edit are unrestricted within scope.
+- `bash` is allowlisted to: `<commands>`.
+- Network calls go through the sandbox; egress allowlist documented in `AGENTS.md`.
+
+## Session evidence
+- Session transcripts under `.agent/logs/`.
+- PR description must link the transcript and the `plan.md`.
+
+## Stop conditions
+- Doom-loop detection: if the same tool is called 5× with similar args, stop.
+- Out-of-scope write attempts: abort + revert + report.

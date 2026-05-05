@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+.env
+
+# uv
+uv.lock.bak
+
+# editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# local-agent-harness
+.agent/logs/
+.env.*
+*.pem
+*.key
+dist/
+.venv/
+.pytest_cache/
+.skills/

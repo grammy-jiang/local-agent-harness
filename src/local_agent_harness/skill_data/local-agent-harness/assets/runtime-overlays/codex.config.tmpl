@@ -1,0 +1,23 @@
+# .codex/config — OpenAI Codex CLI overlay
+#
+# Specializes AGENTS.md for Codex CLI. Never relaxes GROUNDING.md.
+
+[runtime]
+approval_mode = "suggest"   # suggest | auto-edit | full-auto
+model         = "<model-id>"
+max_turns     = 40
+
+[sandbox]
+type        = "devcontainer"
+network     = "deny"        # set to "allowlist" with [sandbox.allowlist]
+
+[paths]
+write_allow = ["src/", "tests/", "docs/", ".agent/plan.md"]
+write_deny  = ["secrets/", ".env*", "**/id_rsa*"]
+
+[commands]
+allow = ["pytest", "ruff", "mypy", "git diff", "git status"]
+deny  = ["rm -rf", "git push --force", "npm publish"]
+
+[telemetry]
+session_log = ".agent/logs/"
