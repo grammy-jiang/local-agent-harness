@@ -7,18 +7,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Verify manifests present
         run: |
           test -f AGENTS.md
           test -f GROUNDING.md
       - name: Forbid scope-relaxing edits to GROUNDING.md
         run: |
-          if git --no-pager diff origin/main...HEAD -- GROUNDING.md | grep -E '^-.*HC[0-9]+'; then
-            echo "Hard constraint removed from GROUNDING.md — blocked." >&2
+          if git --no-pager diff origin/${{ github.base_ref }}...HEAD -- GROUNDING.md \
+              | grep -E '^-.*HC[0-9]+'; then
+            echo "Hard constraint removed from GROUNDING.md - blocked." >&2
             exit 1
           fi
       - name: AI-readiness must not regress
         run: |
-          if [ -f scripts/readiness_report.py ]; then
-            python scripts/readiness_report.py --check-no-regression
+          if command -v local-agent-harness >/dev/null 2>&1 && [ -f .agent/eval/readiness.md ]; then
+            local-agent-harness report --repo . --check-no-regression .agent/eval/readiness.md
           fi

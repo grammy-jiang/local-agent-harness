@@ -59,7 +59,7 @@ TARGETS = [
     ("plan.md.tmpl", ".agent/plan.md.tmpl", ["Inputs", "Allowed scope", "Verification", "Decisions log"], "S0"),
     ("devcontainer.json.tmpl", ".devcontainer/devcontainer.json", ["AGENT_SANDBOX"], "S0"),
     ("pre-commit-config.yaml.tmpl", ".pre-commit-config.yaml", ["gitleaks"], "S0"),
-    ("ci/verify.yml.tmpl", ".github/workflows/verify.yml", ["gitleaks", "manifest_regression"], "S1"),
+    ("ci/verify.yml.tmpl", ".github/workflows/verify.yml", ["gitleaks", "Manifest regression"], "S1"),
     ("ci/governance.yml.tmpl", ".github/workflows/governance.yml", ["GROUNDING.md", "no-regression"], "S2"),
     ("readiness-report.md.tmpl", ".agent/eval/readiness.md.tmpl", ["AI-Readiness Report", "Score"], "S0"),
 ]

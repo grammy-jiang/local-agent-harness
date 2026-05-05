@@ -10,17 +10,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup language toolchain
-        run: echo "TODO: configure for this repo"
+        run: |
+          echo "TODO - configure for this repo"
       - name: Lint / format
-        run: echo "TODO: run linter"
+        run: |
+          echo "TODO - run linter"
       - name: Unit tests
-        run: echo "TODO: run tests"
+        run: |
+          echo "TODO - run tests"
       - name: Secrets scan
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Manifest regression (if scripts/manifest_regression.py exists)
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
+      - name: Manifest regression
         run: |
-          if [ -f scripts/manifest_regression.py ]; then
-            python scripts/manifest_regression.py
+          if command -v local-agent-harness >/dev/null 2>&1; then
+            local-agent-harness validate --repo .
           fi
