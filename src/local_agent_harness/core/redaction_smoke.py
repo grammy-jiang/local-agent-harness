@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import re
-import sys
 from pathlib import Path
 
 # Synthetic markers a real secret should never look like. We search for these
@@ -25,7 +24,7 @@ RED_MARKERS = [
 ]
 
 SCAN_GLOBS = ["**/*.md", "**/*.yml", "**/*.yaml", "**/*.json", "**/*.toml", "**/*.ini", "**/*.env*"]
-SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "dist", "build", "target"}
+SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "dist", "build", "target", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 
 
 def scan(repo: Path) -> list[tuple[Path, str]]:

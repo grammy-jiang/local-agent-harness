@@ -10,14 +10,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup language toolchain
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
         run: |
-          echo "TODO - configure for this repo"
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
       - name: Lint / format
         run: |
-          echo "TODO - run linter"
+          ruff check src tests
       - name: Unit tests
         run: |
-          echo "TODO - run tests"
+          pytest --cov=local_agent_harness --cov-report=term-missing --cov-fail-under=95
       - name: Secrets scan
         uses: gitleaks/gitleaks-action@v2
         env:
