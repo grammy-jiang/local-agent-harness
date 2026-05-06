@@ -7,11 +7,11 @@ on:
 
 jobs:
   build-and-publish:
-    name: Build & publish to PyPI
+    name: Build & publish to PyPI + GitHub Release
     runs-on: ubuntu-latest
     permissions:
       id-token: write   # trusted publisher (PyPI OIDC)
-      contents: read
+      contents: write   # upload release assets
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -19,6 +19,9 @@ jobs:
       - name: Build distribution
         run: uv build
       - name: Publish to PyPI
-        # Configure trusted publisher at https://pypi.org/manage/account/publishing/
-        # before this job can succeed.
         run: uv publish
+      - name: Upload dist to GitHub Release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" dist/* --clobber
