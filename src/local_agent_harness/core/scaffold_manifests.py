@@ -4,15 +4,15 @@
 Three modes:
 
 * ``init``     — render any missing artifacts. Existing files are never
-                 overwritten. (Default. Equivalent to the original
-                 bootstrap behavior.)
+                 overwritten, *except* AGENTS.md whose auto-sections are
+                 always refreshed from detected project state.
 * ``refresh``  — for *stale* artifacts (those missing required anchors
                  according to ``diff_manifests``), back up the original to
                  ``<file>.bak`` and rewrite from the current template.
                  Requires ``--apply`` to actually write; without it, prints
                  a plan only.
-* ``check``    — never writes. Prints drift and exits non-zero on any
-                 drift. Suitable for CI.
+* ``check``    — never writes (except AGENTS.md auto-sections). Prints drift
+                 and exits non-zero on any drift.
 
 The skill works on **any state** of the repository: empty, partially
 configured, or fully mature. Run with ``--mode check`` first to see what
@@ -29,12 +29,15 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 from ._paths import assets_dir as _assets_dir
 ASSETS = _assets_dir()
 
-from . import diff_manifests  # type: ignore
-from . import assess_repo  # type: ignore
+from . import diff_manifests
+from . import assess_repo
+from . import gitignore as _gitignore
+from . import precommit as _precommit
+from . import agents_builder as _agents_builder
 
 CORE_FILES = [
+    # AGENTS.md is handled separately via agents_builder (always updated)
     ("GROUNDING.md.tmpl", "GROUNDING.md"),
-    ("AGENTS.md.tmpl", "AGENTS.md"),
 ]
 
 AGENT_DIR_FILES = [
@@ -43,7 +46,6 @@ AGENT_DIR_FILES = [
 ]
 
 DEVCONTAINER = ("devcontainer.json.tmpl", ".devcontainer/devcontainer.json")
-PRECOMMIT    = ("pre-commit-config.yaml.tmpl", ".pre-commit-config.yaml")
 CI_VERIFY    = ("ci/verify.yml.tmpl", ".github/workflows/verify.yml")
 CI_GOV       = ("ci/governance.yml.tmpl", ".github/workflows/governance.yml")
 
@@ -55,13 +57,11 @@ RUNTIME_OVERLAYS = {
 }
 
 STAGE_INFRA = {
-    "S0": [DEVCONTAINER, PRECOMMIT],
-    "S1": [DEVCONTAINER, PRECOMMIT, CI_VERIFY],
-    "S2": [DEVCONTAINER, PRECOMMIT, CI_VERIFY, CI_GOV],
-    "S3": [DEVCONTAINER, PRECOMMIT, CI_VERIFY, CI_GOV],
+    "S0": [DEVCONTAINER],
+    "S1": [DEVCONTAINER, CI_VERIFY],
+    "S2": [DEVCONTAINER, CI_VERIFY, CI_GOV],
+    "S3": [DEVCONTAINER, CI_VERIFY, CI_GOV],
 }
-
-GITIGNORE_LINES = [".agent/logs/", ".env", ".env.*", "*.pem", "*.key"]
 
 
 def _render_missing(src: Path, dst: Path, dry: bool) -> str:
@@ -87,18 +87,9 @@ def _refresh_stale(src: Path, dst: Path, apply: bool, dry: bool) -> str:
     return f"refreshed (backup at {bak.name}): {dst}"
 
 
+# Keep for backwards-compatibility with existing tests that call it directly
 def _update_gitignore(repo: Path, dry: bool) -> str:
-    gi = repo / ".gitignore"
-    existing = gi.read_text(encoding="utf-8", errors="ignore") if gi.exists() else ""
-    needed = [ln for ln in GITIGNORE_LINES if ln not in existing]
-    if not needed:
-        return "gitignore: already covers .agent/ and secrets"
-    block = "\n# local-agent-harness\n" + "\n".join(needed) + "\n"
-    if dry:
-        return f"would append to .gitignore: {needed}"
-    with gi.open("a", encoding="utf-8") as f:
-        f.write(block)
-    return f"appended to .gitignore: {needed}"
+    return _gitignore.render_gitignore(repo, dry)
 
 
 def _planned_targets(stage: str, runtimes: list[str]) -> list[tuple[str, str]]:
@@ -110,8 +101,14 @@ def _planned_targets(stage: str, runtimes: list[str]) -> list[tuple[str, str]]:
 
 def cmd_init(repo: Path, stage: str, runtimes: list[str], dry: bool) -> int:
     actions: list[str] = []
+
+    # AGENTS.md: always update (create or refresh auto-sections)
+    actions.append(_agents_builder.update_agents_md(repo, dry))
+
+    # Remaining core / infra files: create if missing, never overwrite
     for src, dst in _planned_targets(stage, runtimes):
         actions.append(_render_missing(ASSETS / src, repo / dst, dry))
+
     if stage in {"S1", "S2", "S3"}:
         skills_dir = repo / ".skills"
         if not skills_dir.exists():
@@ -124,7 +121,13 @@ def cmd_init(repo: Path, stage: str, runtimes: list[str], dry: bool) -> int:
                     encoding="utf-8",
                 )
                 actions.append(f"created: {skills_dir}/_template.SKILL.md")
-    actions.append(_update_gitignore(repo, dry))
+
+    # .gitignore: smart download + harness lines
+    actions.append(_gitignore.render_gitignore(repo, dry))
+
+    # .pre-commit-config.yaml: language-aware generation
+    actions.append(_precommit.render_precommit(repo, dry))
+
     for a in actions:
         print(a)
     return 0
@@ -161,6 +164,9 @@ def cmd_refresh(repo: Path, stage: str, runtimes: list[str], apply: bool, dry: b
 
 
 def cmd_check(repo: Path, stage: str) -> int:
+    # Also update AGENTS.md auto-sections during check
+    msg = _agents_builder.update_agents_md(repo, dry=False)
+    print(f"[agents_builder] {msg}")
     result = diff_manifests.diff(repo, stage=stage)
     diff_manifests._print_human(result)
     return 1 if result["drift"] else 0
@@ -197,3 +203,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

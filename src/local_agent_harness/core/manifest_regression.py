@@ -57,11 +57,10 @@ def check(repo: Path) -> list[tuple[str, bool, str]]:
 
     # AGENTS.md sections
     required_sections = [
-        "Success Definition",
-        "Assessment Rubric",
+        "Testing",
         "Scope Boundary",
-        "Quality Gate",
-        "Cost and Context Policy",
+        "Security",
+        "PR Checklist",
     ]
     for sec in required_sections:
         results.append((

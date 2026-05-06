@@ -5,7 +5,7 @@ from typing import Optional
 
 import typer
 
-from local_agent_harness.core import diff_manifests
+from local_agent_harness.core import agents_builder, diff_manifests
 
 
 def run(
@@ -17,6 +17,8 @@ def run(
     if not repo.exists():
         typer.echo(f"error: {repo} does not exist", err=True)
         raise typer.Exit(code=2)
+    # Always refresh AGENTS.md auto-sections on check
+    agents_builder.update_agents_md(repo, dry=False)
     result = diff_manifests.diff(repo, stage=stage)
     if json_output:
         import json

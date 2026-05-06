@@ -1,6 +1,8 @@
 # .codex/config — OpenAI Codex CLI overlay
 #
-# Specializes AGENTS.md for Codex CLI. Never relaxes GROUNDING.md.
+# Specializes AGENTS.md for Codex CLI.  Never relaxes GROUNDING.md.
+# Shared context (build commands, conventions, scope boundary) lives in
+# AGENTS.md.  This file adds only Codex CLI–specific settings.
 
 [runtime]
 approval_mode = "suggest"   # suggest | auto-edit | full-auto
@@ -12,6 +14,7 @@ type        = "devcontainer"
 network     = "deny"        # set to "allowlist" with [sandbox.allowlist]
 
 [paths]
+# See AGENTS.md §Scope Boundary for the canonical list.
 write_allow = ["src/", "tests/", "docs/", ".agent/plan.md"]
 write_deny  = ["secrets/", ".env*", "**/id_rsa*"]
 
