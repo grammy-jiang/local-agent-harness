@@ -46,7 +46,14 @@ def test_read_swallows_errors(tmp_path: Path) -> None:
 
 def test_print_human_no_drift(capsys: pytest.CaptureFixture[str]) -> None:
     diff_manifests._print_human(
-        {"stage": "S0", "drift": False, "missing": [], "stale": [], "relaxed": [], "out_of_stage": []}
+        {
+            "stage": "S0",
+            "drift": False,
+            "missing": [],
+            "stale": [],
+            "relaxed": [],
+            "out_of_stage": [],
+        }
     )
     out = capsys.readouterr().out
     assert "no drift" in out
@@ -58,7 +65,13 @@ def test_print_human_all_categories(capsys: pytest.CaptureFixture[str]) -> None:
             "stage": "S2",
             "drift": True,
             "missing": [{"path": "AGENTS.md", "template": "AGENTS.md.tmpl"}],
-            "stale": [{"path": "GROUNDING.md", "missing_anchors": ["X", "Y"], "template": "GROUNDING.md.tmpl"}],
+            "stale": [
+                {
+                    "path": "GROUNDING.md",
+                    "missing_anchors": ["X", "Y"],
+                    "template": "GROUNDING.md.tmpl",
+                }
+            ],
             "relaxed": [{"path": "CLAUDE.md", "pattern": "allow secrets"}],
             "out_of_stage": [{"path": ".skills/", "required_for": "S2"}],
         }

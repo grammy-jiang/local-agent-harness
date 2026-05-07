@@ -34,7 +34,9 @@ def _protect_skill_data(tmp_path_factory: pytest.TempPathFactory) -> None:
 
 
 @pytest.fixture
-def isolated_skill_root(tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch) -> Path:
+def isolated_skill_root(
+    tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch
+) -> Path:
     """Return a copy of skill_data the test can freely symlink/mutate
     without endangering the packaged assets.
     """
@@ -42,7 +44,5 @@ def isolated_skill_root(tmp_path_factory: pytest.TempPathFactory, monkeypatch: p
     fake = tmp_path_factory.mktemp("isolated_skill") / "local-agent-harness"
     shutil.copytree(src, fake)
     monkeypatch.setattr(_paths, "skill_data_root", lambda: fake)
-    monkeypatch.setattr(
-        "local_agent_harness.cli.cmd_setup.skill_data_root", lambda: fake
-    )
+    monkeypatch.setattr("local_agent_harness.cli.cmd_setup.skill_data_root", lambda: fake)
     return fake

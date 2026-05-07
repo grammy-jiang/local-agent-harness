@@ -71,7 +71,9 @@ def test_main_no_regression_clean(empty_repo: Path, capsys: pytest.CaptureFixtur
     assert "no regression" in out
 
 
-def test_main_no_regression_detects_drop(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_no_regression_detects_drop(
+    empty_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     # Build state with documentation=1 (README only)
     (empty_repo / "README.md").write_text("# x\n")
     _run_main(readiness_report, ["--repo", str(empty_repo)])
@@ -100,7 +102,9 @@ def _run_main(module, argv: list[str]) -> int:
         sys.argv = saved
 
 
-def test_main_no_regression_handles_int_parse_failure(empty_repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_no_regression_handles_int_parse_failure(
+    empty_repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Non-int values in machine block should be ignored, not crash."""
     out_dir = empty_repo / ".agent" / "eval"
     out_dir.mkdir(parents=True)

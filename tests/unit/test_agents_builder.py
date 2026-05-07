@@ -49,9 +49,7 @@ def test_detect_python_target_version(empty_repo: Path) -> None:
 
 def test_detect_python_grounding_reads(empty_repo: Path) -> None:
     (empty_repo / "pyproject.toml").write_text("[project]\nname='x'\n")
-    (empty_repo / "GROUNDING.md").write_text(
-        "Use Conventional Commits.\nBranch: agent/foo\n"
-    )
+    (empty_repo / "GROUNDING.md").write_text("Use Conventional Commits.\nBranch: agent/foo\n")
     info = agents_builder.detect_project_info(empty_repo)
     assert info["commit_style"] == "Conventional Commits"
     assert info["branch_pattern"] == "agent/<task-slug>"
@@ -152,7 +150,9 @@ def test_update_agents_md_refreshes_auto_sections(empty_repo: Path) -> None:
     # First create
     agents_builder.update_agents_md(empty_repo, dry=False)
     # Add a pyproject.toml to change detected info
-    (empty_repo / "pyproject.toml").write_text("[project]\nname='x'\n\n[tool.ruff]\nline-length=88\n")
+    (empty_repo / "pyproject.toml").write_text(
+        "[project]\nname='x'\n\n[tool.ruff]\nline-length=88\n"
+    )
     msg = agents_builder.update_agents_md(empty_repo, dry=False)
     content = (empty_repo / "AGENTS.md").read_text()
     assert "Python" in content
@@ -162,7 +162,9 @@ def test_update_agents_md_refreshes_auto_sections(empty_repo: Path) -> None:
 def test_update_agents_md_dry_refresh(empty_repo: Path) -> None:
     # Create, then ask for dry refresh of something that would change
     agents_builder.update_agents_md(empty_repo, dry=False)
-    (empty_repo / "pyproject.toml").write_text("[project]\nname='x'\n\n[tool.ruff]\nline-length=88\n")
+    (empty_repo / "pyproject.toml").write_text(
+        "[project]\nname='x'\n\n[tool.ruff]\nline-length=88\n"
+    )
     msg = agents_builder.update_agents_md(empty_repo, dry=True)
     assert "would refresh" in msg or "up to date" in msg
 
@@ -204,4 +206,3 @@ def test_update_agents_md_idempotent(empty_repo: Path) -> None:
     agents_builder.update_agents_md(empty_repo, dry=False)
     content_after = (empty_repo / "AGENTS.md").read_text()
     assert content_before == content_after
-

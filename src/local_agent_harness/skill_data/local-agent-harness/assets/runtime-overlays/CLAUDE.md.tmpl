@@ -1,27 +1,32 @@
-# CLAUDE.md — Claude Code overlay
+# CLAUDE.md — Claude Code project instructions
 
-> Specializes `AGENTS.md` for Claude Code.  Never relaxes `GROUNDING.md`.
-> **Shared context (build commands, conventions, scope boundary) lives in
-> `AGENTS.md`.**  This file adds only Claude Code–specific behaviour.
+<!-- DRY: shared build commands, conventions, and scope boundary live in  -->
+<!-- AGENTS.md.  This file imports it and adds Claude Code-only settings. -->
 
-## Permission ladder (Claude Code)
-- Default mode: `<plan | default | accept-edits>`
-- Tools enabled: `Read`, `Glob`, `Grep`, `Edit`, `Bash` (allowlisted).
-- Tools disabled: `<list>`
-- MCP servers: `<list with version pins>`
+@AGENTS.md
 
-## Plan mode
-- Required for: cross-cutting refactors, dependency upgrades, schema changes.
-- Triggered by phrases: "refactor", "upgrade", "migrate", "redesign".
+<!-- claude-code-only: begin -->
+## Claude Code–specific behaviour
 
-## Skills
-- Repository skills live under `.skills/*.SKILL.md`.
-- Skills are lazy-loaded; do not pre-load all skills.
+### Permission ladder
+- Default mode: `default`  (switch to `plan` for risky changes)
+- Allowed tools: `Read`, `Glob`, `Grep`, `Edit`, `Bash` (allow-listed in
+  `.claude/settings.json`)
+- Denied by default: `curl`, `wget`, secrets files, `.env*`
+- MCP servers: none configured by default — add to `.mcp.json`
 
-## Compaction
-- Compact at 70 % of context.
-- Always retain: `AGENTS.md`, current `plan.md`, last 5 tool calls, open diff.
+### When to enter Plan mode
+Activate Plan mode (propose before writing) for:
+cross-cutting refactors, dependency upgrades, schema / DB migrations, and
+any request containing the words *refactor*, *upgrade*, *migrate*, or
+*redesign*.
 
-## Stop conditions specific to Claude Code
-- If a tool call fails 3× consecutively, stop and ask.
-- If `accept-edits` writes outside scope, abort and revert.
+### Compaction
+Compact at 70 % of context window.
+Always retain: `AGENTS.md`, current `plan.md`, last 5 tool calls, open diff.
+
+### Stop conditions
+- If a tool call fails 3× consecutively → stop and ask the user.
+- If `accept-edits` mode writes outside the declared scope → abort and
+  revert, then report what happened.
+<!-- claude-code-only: end -->

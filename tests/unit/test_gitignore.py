@@ -118,10 +118,13 @@ def test_fetch_gitignore_template_success() -> None:
     class MockResp:
         def __enter__(self) -> "MockResp":
             return self
+
         def __exit__(self, *a: object) -> None:
             pass
+
         def read(self) -> bytes:
             return b"# python gitignore\n*.pyc\n"
+
     with patch("urllib.request.urlopen", return_value=MockResp()):
         result = gitignore.fetch_gitignore_template(["python"])
     assert "python gitignore" in result

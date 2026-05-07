@@ -31,8 +31,6 @@ def test_skill_data_root_raises_when_missing(monkeypatch: pytest.MonkeyPatch) ->
         def __str__(self) -> str:
             return "/nonexistent/path/to/skill"
 
-    monkeypatch.setattr(
-        _paths.importlib.resources, "files", lambda _pkg: _FakeRef()
-    )
+    monkeypatch.setattr(_paths.importlib.resources, "files", lambda _pkg: _FakeRef())
     with pytest.raises(RuntimeError, match="skill_data not found"):
         _paths.skill_data_root()

@@ -12,6 +12,7 @@ Strategy:
   3. On subsequent runs, refresh only the auto-generated sections (those
      between sentinel comments) while preserving human edits.
 """
+
 from __future__ import annotations
 
 import re
@@ -25,7 +26,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 _BEGIN = "<!-- local-agent-harness:auto:begin -->"
-_END   = "<!-- local-agent-harness:auto:end -->"
+_END = "<!-- local-agent-harness:auto:end -->"
 
 # ---------------------------------------------------------------------------
 # Project info detection
@@ -43,7 +44,8 @@ def _git(repo: Path, *args: str) -> str:
     try:
         return subprocess.check_output(
             ["git", "-C", str(repo), *args],
-            stderr=subprocess.DEVNULL, text=True,
+            stderr=subprocess.DEVNULL,
+            text=True,
         ).strip()
     except Exception:
         return ""
@@ -79,14 +81,12 @@ def detect_project_info(repo: Path) -> dict[str, Any]:
         if "pytest" in text:
             cov_match = re.search(r"--cov-fail-under=(\d+)", text)
             cov = cov_match.group(1) if cov_match else None
-            info["test_cmds"].append(
-                f"pytest{'  # --cov-fail-under=' + cov if cov else ''}"
-            )
+            info["test_cmds"].append(f"pytest{'  # --cov-fail-under=' + cov if cov else ''}")
             info["test_cmds"].append("pytest path/to/test_file.py::test_function_name")
 
         # linter
         if "ruff" in text:
-            line_match = re.search(r'line-length\s*=\s*(\d+)', text)
+            line_match = re.search(r"line-length\s*=\s*(\d+)", text)
             ll = line_match.group(1) if line_match else "88"
             info["lint_cmds"].append("ruff check src tests")
             info["format_cmds"].append("ruff format src tests")
@@ -111,14 +111,18 @@ def detect_project_info(repo: Path) -> dict[str, Any]:
     pkg = repo / "package.json"
     if pkg.exists():
         import json
+
         try:
             data = json.loads(_read(pkg))
         except Exception:
             data = {}
         info["stack"].append("Node.js")
         scripts = data.get("scripts", {})
-        pm = "pnpm" if (repo / "pnpm-lock.yaml").exists() else (
-              "yarn" if (repo / "yarn.lock").exists() else "npm")
+        pm = (
+            "pnpm"
+            if (repo / "pnpm-lock.yaml").exists()
+            else ("yarn" if (repo / "yarn.lock").exists() else "npm")
+        )
         if "install" not in [c.split()[0] for c in info["install_cmds"]]:
             info["install_cmds"].append(f"{pm} install")
         for key in ("build", "compile"):
@@ -185,7 +189,8 @@ def _build_auto_block(info: dict[str, Any]) -> str:
         parts.append(_section("Build", _cmds_block(info["build_cmds"])))
 
     test_body = (
-        _cmds_block(info["test_cmds"]) if info["test_cmds"]
+        _cmds_block(info["test_cmds"])
+        if info["test_cmds"]
         else "_No test commands detected — add them here._\n"
     )
     parts.append(_section("Testing", test_body))
@@ -237,7 +242,8 @@ def build_agents_md(repo: Path, info: dict[str, Any]) -> str:
         "# AGENTS.md\n\n"
         "> Agent instructions for this repository.\n"
         "> See also: `GROUNDING.md` (hard constraints), `.agent/plan.md` (session plan).\n\n"
-        + auto_block + "\n\n"
+        + auto_block
+        + "\n\n"
         + static_block
     )
 

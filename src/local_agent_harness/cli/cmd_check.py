@@ -22,6 +22,7 @@ def run(
     result = diff_manifests.diff(repo, stage=stage)
     if json_output:
         import json
+
         typer.echo(json.dumps(result, indent=2, sort_keys=True))
     else:
         diff_manifests._print_human(result)

@@ -10,9 +10,12 @@ from local_agent_harness.core import assess_repo, readiness_report
 
 def run(
     repo: Path = typer.Option(Path("."), "--repo", help="Repository path."),
-    out: Optional[Path] = typer.Option(None, "--out", help="Write report to this path (default stdout)."),
+    out: Optional[Path] = typer.Option(
+        None, "--out", help="Write report to this path (default stdout)."
+    ),
     check_no_regression: Optional[Path] = typer.Option(
-        None, "--check-no-regression",
+        None,
+        "--check-no-regression",
         help="Compare a fresh assessment against an existing readiness file; fail on per-axis regressions.",
     ),
 ) -> None:

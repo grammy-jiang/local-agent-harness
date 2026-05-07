@@ -4,6 +4,7 @@ The package ships a copy of the skill under
 ``local_agent_harness/skill_data/local-agent-harness/``. This module finds
 the assets directory whether installed as a wheel or used in editable mode.
 """
+
 from __future__ import annotations
 
 import importlib.resources

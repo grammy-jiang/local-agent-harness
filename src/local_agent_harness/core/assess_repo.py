@@ -6,6 +6,7 @@ Usage:
 
 Stdlib + git only. Soft-detects optional tools via PATH.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,11 +34,31 @@ def _git(repo: Path, *args: str) -> str:
 
 
 def _count_source_files(repo: Path) -> int:
-    exts = {".py", ".js", ".ts", ".tsx", ".go", ".rs", ".java", ".kt", ".rb", ".cs", ".cpp", ".c", ".swift", ".scala"}
+    exts = {
+        ".py",
+        ".js",
+        ".ts",
+        ".tsx",
+        ".go",
+        ".rs",
+        ".java",
+        ".kt",
+        ".rb",
+        ".cs",
+        ".cpp",
+        ".c",
+        ".swift",
+        ".scala",
+    }
     n = 0
     for root, dirs, files in os.walk(repo):
         # prune common noise
-        dirs[:] = [d for d in dirs if d not in {".git", "node_modules", ".venv", "venv", "dist", "build", "target", ".agent"}]
+        dirs[:] = [
+            d
+            for d in dirs
+            if d
+            not in {".git", "node_modules", ".venv", "venv", "dist", "build", "target", ".agent"}
+        ]
         for f in files:
             if Path(f).suffix in exts:
                 n += 1
@@ -57,8 +78,12 @@ def detect(repo: Path) -> dict:
     )
     has_tests = _exists(repo, "tests") or _exists(repo, "test") or _exists(repo, "__tests__")
     has_src = _exists(repo, "src") or _exists(repo, "lib") or _exists(repo, "app")
-    has_devc = _exists(repo, ".devcontainer", "devcontainer.json") or _exists(repo, ".devcontainer.json")
-    has_precommit = _exists(repo, ".pre-commit-config.yaml") or _exists(repo, ".pre-commit-config.yml")
+    has_devc = _exists(repo, ".devcontainer", "devcontainer.json") or _exists(
+        repo, ".devcontainer.json"
+    )
+    has_precommit = _exists(repo, ".pre-commit-config.yaml") or _exists(
+        repo, ".pre-commit-config.yml"
+    )
     has_skills = _exists(repo, ".skills")
     has_governance = _exists(repo, ".github", "workflows", "governance.yml")
     has_overlays = any(
@@ -87,48 +112,73 @@ def detect(repo: Path) -> dict:
     axes = {}
     # Agent config
     a = 0
-    if has_agents: a += 1
-    if has_agents and has_grounding: a = max(a, 2)
-    if a >= 2 and has_overlays: a = 3
-    if a >= 3 and has_skills: a = 4
-    if a >= 4 and _exists(repo, "scripts", "manifest_regression.py"): a = 5
+    if has_agents:
+        a += 1
+    if has_agents and has_grounding:
+        a = max(a, 2)
+    if a >= 2 and has_overlays:
+        a = 3
+    if a >= 3 and has_skills:
+        a = 4
+    if a >= 4 and _exists(repo, "scripts", "manifest_regression.py"):
+        a = 5
     axes["agent_config"] = a
 
     # Documentation
     d = 0
-    if has_readme: d = 1
-    if d >= 1 and (repo / "CONTRIBUTING.md").exists(): d = 2
-    if d >= 2 and ((repo / "docs" / "decisions").exists() or (repo / "ADR").exists()): d = 3
-    if d >= 3 and (repo / "docs").exists(): d = 4
-    if d >= 4 and has_agents: d = 5
+    if has_readme:
+        d = 1
+    if d >= 1 and (repo / "CONTRIBUTING.md").exists():
+        d = 2
+    if d >= 2 and ((repo / "docs" / "decisions").exists() or (repo / "ADR").exists()):
+        d = 3
+    if d >= 3 and (repo / "docs").exists():
+        d = 4
+    if d >= 4 and has_agents:
+        d = 5
     axes["documentation"] = d
 
     # CI/CD
     c = 0
-    if has_ci: c = 1
-    if c >= 1 and has_tests: c = 2
-    if c >= 2 and (has_precommit or has_gitleaks): c = 3
-    if c >= 3 and has_governance: c = 4
-    if c >= 4 and _exists(repo, "scripts", "readiness_report.py"): c = 5
+    if has_ci:
+        c = 1
+    if c >= 1 and has_tests:
+        c = 2
+    if c >= 2 and (has_precommit or has_gitleaks):
+        c = 3
+    if c >= 3 and has_governance:
+        c = 4
+    if c >= 4 and _exists(repo, "scripts", "readiness_report.py"):
+        c = 5
     axes["ci_cd"] = c
 
     # Code structure
     s = 0
-    if has_src or src_files >= 1: s = 1
-    if s >= 1 and has_tests: s = 2
-    if s >= 2 and has_readme: s = 3
+    if has_src or src_files >= 1:
+        s = 1
+    if s >= 1 and has_tests:
+        s = 2
+    if s >= 2 and has_readme:
+        s = 3
     # heuristics for 4-5 are weak from outside; keep conservative
-    if s >= 3 and has_agents: s = 4
-    if s >= 4 and has_governance: s = 5
+    if s >= 3 and has_agents:
+        s = 4
+    if s >= 4 and has_governance:
+        s = 5
     axes["code_structure"] = s
 
     # Security
     sec = 0
-    if has_logs_ignored: sec = 1
-    if sec >= 1 and (has_precommit and has_gitleaks): sec = 2
-    if sec >= 2 and has_pip_audit: sec = 3
-    if sec >= 3 and has_semgrep: sec = 4
-    if sec >= 4 and has_devc: sec = 5
+    if has_logs_ignored:
+        sec = 1
+    if sec >= 1 and (has_precommit and has_gitleaks):
+        sec = 2
+    if sec >= 2 and has_pip_audit:
+        sec = 3
+    if sec >= 3 and has_semgrep:
+        sec = 4
+    if sec >= 4 and has_devc:
+        sec = 5
     axes["security"] = sec
 
     total = sum(axes.values())
@@ -150,20 +200,32 @@ def detect(repo: Path) -> dict:
         pass
 
     detected_runtimes = []
-    if (repo / "CLAUDE.md").exists(): detected_runtimes.append("claude-code")
-    if (repo / ".codex" / "config").exists(): detected_runtimes.append("codex-cli")
-    if (repo / ".github" / "copilot-cli.md").exists(): detected_runtimes.append("copilot-cli")
-    if (repo / ".cursor" / "rules").exists(): detected_runtimes.append("cursor")
+    if (repo / "CLAUDE.md").exists():
+        detected_runtimes.append("claude-code")
+    if (repo / ".codex" / "config").exists():
+        detected_runtimes.append("codex-cli")
+    if (repo / ".github" / "copilot-cli.md").exists():
+        detected_runtimes.append("copilot-cli")
+    if (repo / ".cursor" / "rules").exists():
+        detected_runtimes.append("cursor")
 
     missing = []
-    if not has_grounding: missing.append("GROUNDING.md")
-    if not has_agents: missing.append("AGENTS.md")
-    if not has_devc: missing.append(".devcontainer/devcontainer.json")
-    if not has_precommit: missing.append(".pre-commit-config.yaml")
-    if not has_ci: missing.append(".github/workflows/verify.yml")
-    if not has_governance: missing.append(".github/workflows/governance.yml")
-    if not has_skills: missing.append(".skills/")
-    if not has_logs_ignored: missing.append(".gitignore (.agent/, .env*)")
+    if not has_grounding:
+        missing.append("GROUNDING.md")
+    if not has_agents:
+        missing.append("AGENTS.md")
+    if not has_devc:
+        missing.append(".devcontainer/devcontainer.json")
+    if not has_precommit:
+        missing.append(".pre-commit-config.yaml")
+    if not has_ci:
+        missing.append(".github/workflows/verify.yml")
+    if not has_governance:
+        missing.append(".github/workflows/governance.yml")
+    if not has_skills:
+        missing.append(".skills/")
+    if not has_logs_ignored:
+        missing.append(".gitignore (.agent/, .env*)")
 
     return {
         "stage": stage,

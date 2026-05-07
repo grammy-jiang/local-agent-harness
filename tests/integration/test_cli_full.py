@@ -186,7 +186,9 @@ def test_setup_force_replaces_file(tmp_path: Path) -> None:
     assert (target / "SKILL.md").exists()
 
 
-def test_setup_default_targets_when_no_skill_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_setup_default_targets_when_no_skill_root(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """If none of ~/.claude/skills, ~/.copilot/skills, ~/.codex/skills exist,
     falls back to first candidate under fake home."""
     fake_home = tmp_path / "home"
@@ -197,7 +199,9 @@ def test_setup_default_targets_when_no_skill_root(monkeypatch: pytest.MonkeyPatc
     assert ".claude/skills/local-agent-harness" in r.stdout
 
 
-def test_setup_default_targets_finds_existing(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_setup_default_targets_finds_existing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     fake_home = tmp_path / "home"
     (fake_home / ".copilot" / "skills").mkdir(parents=True)
     monkeypatch.setattr(Path, "home", lambda: fake_home)
@@ -217,9 +221,12 @@ def test_main_module_invocation() -> None:
     """Cover __main__.py."""
     import subprocess
     import sys
+
     r = subprocess.run(
         [sys.executable, "-m", "local_agent_harness", "version"],
-        capture_output=True, text=True, check=False,
+        capture_output=True,
+        text=True,
+        check=False,
     )
     assert r.returncode == 0
     assert "local-agent-harness" in r.stdout

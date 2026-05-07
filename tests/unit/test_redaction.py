@@ -83,7 +83,9 @@ def test_main_fail_with_finding(empty_repo: Path, capsys: pytest.CaptureFixture[
     assert "FAIL" in out
 
 
-def test_main_fail_when_gitignore_missing(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_fail_when_gitignore_missing(
+    empty_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     rc = _run_main(redaction_smoke, ["--repo", str(empty_repo)])
     out = capsys.readouterr().out
     assert rc == 1

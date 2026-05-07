@@ -10,10 +10,10 @@ from local_agent_harness.core import assess_repo, scaffold_manifests
 
 _AVAILABLE_RUNTIMES = ["copilot-cli", "claude-code", "codex-cli", "cursor"]
 _RUNTIME_LABELS = {
-    "copilot-cli": "GitHub Copilot CLI  (.github/copilot-cli.md)",
-    "claude-code":  "Claude Code         (CLAUDE.md)",
-    "codex-cli":    "OpenAI Codex CLI    (.codex/config)",
-    "cursor":       "Cursor              (.cursor/rules)",
+    "copilot-cli": "GitHub Copilot  (.github/copilot-instructions.md + .github/instructions/)",
+    "claude-code": "Claude Code     (CLAUDE.md @AGENTS.md + .claude/settings.json)",
+    "codex-cli": "OpenAI Codex    (AGENTS.md primary + .codex/INSTRUCTIONS.md)",
+    "cursor": "Cursor          (.cursor/rules)",
 }
 
 

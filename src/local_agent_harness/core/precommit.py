@@ -9,6 +9,7 @@ Strategy:
   3. Add a global ``exclude`` regex that covers generated files and
      repository files that should not be linted (.gitignore, lock files, etc.).
 """
+
 from __future__ import annotations
 
 import os
@@ -23,30 +24,30 @@ from pathlib import Path
 #: file-system signal → set of "language" tags
 _SIGNAL_LANG: list[tuple[str, str]] = [
     ("pyproject.toml", "python"),
-    ("setup.py",       "python"),
-    ("setup.cfg",      "python"),
+    ("setup.py", "python"),
+    ("setup.cfg", "python"),
     ("requirements.txt", "python"),
-    (".py",            "python"),
-    ("package.json",   "javascript"),
-    (".js",            "javascript"),
-    (".ts",            "typescript"),
-    (".tsx",           "typescript"),
-    (".jsx",           "javascript"),
-    ("go.mod",         "go"),
-    (".go",            "go"),
-    ("Cargo.toml",     "rust"),
-    (".rs",            "rust"),
-    ("pom.xml",        "java"),
-    ("build.gradle",   "java"),
-    (".java",          "java"),
-    (".sh",            "shell"),
-    (".bash",          "shell"),
-    (".md",            "markdown"),
-    (".yaml",          "yaml"),
-    (".yml",           "yaml"),
-    (".tf",            "terraform"),
-    (".rb",            "ruby"),
-    ("Gemfile",        "ruby"),
+    (".py", "python"),
+    ("package.json", "javascript"),
+    (".js", "javascript"),
+    (".ts", "typescript"),
+    (".tsx", "typescript"),
+    (".jsx", "javascript"),
+    ("go.mod", "go"),
+    (".go", "go"),
+    ("Cargo.toml", "rust"),
+    (".rs", "rust"),
+    ("pom.xml", "java"),
+    ("build.gradle", "java"),
+    (".java", "java"),
+    (".sh", "shell"),
+    (".bash", "shell"),
+    (".md", "markdown"),
+    (".yaml", "yaml"),
+    (".yml", "yaml"),
+    (".tf", "terraform"),
+    (".rb", "ruby"),
+    ("Gemfile", "ruby"),
 ]
 
 
@@ -117,41 +118,35 @@ _LANG_HOOKS: dict[str, str] = {
     hooks:
       - id: mypy
         additional_dependencies: ["mypy>=1.10"]""",
-
     "javascript": """\
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         exclude: \\.gitignore$""",
-
     "typescript": """\
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
         exclude: \\.gitignore$""",
-
     "go": """\
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
     hooks:
       - id: go-fmt
       - id: go-vet""",
-
     "rust": """\
   - repo: https://github.com/doublify/pre-commit-rust
     rev: v1.0
     hooks:
       - id: fmt
       - id: cargo-check""",
-
     "shell": """\
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
     hooks:
       - id: shellcheck""",
-
     "markdown": """\
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.44.0
@@ -159,7 +154,6 @@ _LANG_HOOKS: dict[str, str] = {
       - id: markdownlint
         args: ["--disable", "MD013"]
         exclude: \\.gitignore$""",
-
     "yaml": """\
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.0
@@ -167,13 +161,11 @@ _LANG_HOOKS: dict[str, str] = {
       - id: yamllint
         args: ["-d", "{extends: relaxed, rules: {line-length: {max: 120}}}"]
         exclude: \\.gitignore$""",
-
     "terraform": """\
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.99.4
     hooks:
       - id: terraform_fmt""",
-
     "ruby": """\
   - repo: https://github.com/rubocop/rubocop
     rev: v1.75.5
@@ -183,15 +175,15 @@ _LANG_HOOKS: dict[str, str] = {
 
 # Paths / patterns that should be globally excluded from hooks
 _GLOBAL_EXCLUDE_PATTERNS = [
-    r"\.gitignore$",             # managed by local-agent-harness
+    r"\.gitignore$",  # managed by local-agent-harness
     r"(^|/)dist/",
     r"(^|/)build/",
     r"(^|/)\.venv/",
     r"(^|/)venv/",
     r"(^|/)node_modules/",
     r"(^|/)\.agent/logs/",
-    r".*\.lock$",                # lock files
-    r".*\.min\.(js|css)$",       # minified assets
+    r".*\.lock$",  # lock files
+    r".*\.min\.(js|css)$",  # minified assets
 ]
 
 _GLOBAL_EXCLUDE = "(?x)^(\n  " + " |\n  ".join(_GLOBAL_EXCLUDE_PATTERNS) + "\n)$"

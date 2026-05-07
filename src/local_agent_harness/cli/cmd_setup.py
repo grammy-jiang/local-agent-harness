@@ -10,6 +10,7 @@ parent directory already exists on disk:
 Use ``--target PATH`` (repeatable) to install elsewhere, e.g. into a
 project-local ``.github/skills/<name>/`` directory.
 """
+
 from __future__ import annotations
 
 import shutil

@@ -18,6 +18,7 @@ local-agent-harness skill.
 Usage:
     python diff_manifests.py [--repo PATH] [--json] [--stage S0|S1|S2|S3]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -28,6 +29,7 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 from ._paths import assets_dir as _assets_dir
+
 ASSETS = _assets_dir()
 
 from . import assess_repo  # type: ignore
@@ -53,42 +55,99 @@ TARGETS = [
         ],
         "S0",
     ),
-    ("plan.md.tmpl", ".agent/plan.md.tmpl", ["Inputs", "Allowed scope", "Verification", "Decisions log"], "S0"),
+    (
+        "plan.md.tmpl",
+        ".agent/plan.md.tmpl",
+        ["Inputs", "Allowed scope", "Verification", "Decisions log"],
+        "S0",
+    ),
     ("devcontainer.json.tmpl", ".devcontainer/devcontainer.json", ["AGENT_SANDBOX"], "S0"),
     ("pre-commit-config.yaml.tmpl", ".pre-commit-config.yaml", ["gitleaks"], "S0"),
-    ("ci/verify.yml.tmpl", ".github/workflows/verify.yml", ["gitleaks", "Manifest regression"], "S1"),
-    ("ci/governance.yml.tmpl", ".github/workflows/governance.yml", ["GROUNDING.md", "no-regression"], "S2"),
-    ("readiness-report.md.tmpl", ".agent/eval/readiness.md.tmpl", ["AI-Readiness Report", "Score"], "S0"),
+    (
+        "ci/verify.yml.tmpl",
+        ".github/workflows/verify.yml",
+        ["gitleaks", "Manifest regression"],
+        "S1",
+    ),
+    (
+        "ci/governance.yml.tmpl",
+        ".github/workflows/governance.yml",
+        ["GROUNDING.md", "no-regression"],
+        "S2",
+    ),
+    (
+        "readiness-report.md.tmpl",
+        ".agent/eval/readiness.md.tmpl",
+        ["AI-Readiness Report", "Score"],
+        "S0",
+    ),
 ]
 
 _STAGE_ORDER = {"S0": 0, "S1": 1, "S2": 2, "S3": 3}
 
 OVERLAYS = {
-    "claude-code":  ("runtime-overlays/CLAUDE.md.tmpl",          "CLAUDE.md",                    ["Permission ladder", "Skills"]),
-    "codex-cli":    ("runtime-overlays/codex.config.tmpl",       ".codex/config",                ["[runtime]", "[paths]"]),
-    "copilot-cli":  ("runtime-overlays/copilot-cli.tmpl",        ".github/copilot-cli.md",       ["Permission posture", "Stop conditions"]),
-    "cursor":       ("runtime-overlays/cursor-rules.tmpl",       ".cursor/rules",                ["Always", "Never"]),
+    "claude-code": (
+        "runtime-overlays/CLAUDE.md.tmpl",
+        "CLAUDE.md",
+        ["Permission ladder", "claude-code-only"],
+    ),
+    "codex-cli": ("runtime-overlays/codex.config.tmpl", ".codex/INSTRUCTIONS.md", ["AGENTS.md"]),
+    "copilot-cli": (
+        "runtime-overlays/copilot-cli.tmpl",
+        ".github/copilot-instructions.md",
+        ["AGENTS.md", "Copilot"],
+    ),
+    "cursor": ("runtime-overlays/cursor-rules.tmpl", ".cursor/rules", ["Always", "Never"]),
 }
 
 # patterns whose presence in any manifest signals a "relaxed" hard constraint
 RELAX_PATTERNS = [
-    re.compile(r"allow.{0,12}secret",   re.IGNORECASE),
+    re.compile(r"allow.{0,12}secret", re.IGNORECASE),
     re.compile(r"disable.{0,8}gitleaks", re.IGNORECASE),
-    re.compile(r"skip.{0,8}verify",     re.IGNORECASE),
+    re.compile(r"skip.{0,8}verify", re.IGNORECASE),
     re.compile(r"bypass.{0,8}permissions", re.IGNORECASE),
 ]
 
 # Stage gates: artifacts each stage requires
 STAGE_REQUIREMENTS = {
-    "S0": ["GROUNDING.md", "AGENTS.md", ".agent/plan.md.tmpl", ".devcontainer/devcontainer.json", ".pre-commit-config.yaml"],
-    "S1": ["GROUNDING.md", "AGENTS.md", ".agent/plan.md.tmpl", ".devcontainer/devcontainer.json",
-           ".pre-commit-config.yaml", ".github/workflows/verify.yml", ".skills/"],
-    "S2": ["GROUNDING.md", "AGENTS.md", ".agent/plan.md.tmpl", ".devcontainer/devcontainer.json",
-           ".pre-commit-config.yaml", ".github/workflows/verify.yml", ".github/workflows/governance.yml",
-           ".skills/", ".agent/eval/readiness.md"],
-    "S3": ["GROUNDING.md", "AGENTS.md", ".agent/plan.md.tmpl", ".devcontainer/devcontainer.json",
-           ".pre-commit-config.yaml", ".github/workflows/verify.yml", ".github/workflows/governance.yml",
-           ".skills/", ".agent/eval/readiness.md"],
+    "S0": [
+        "GROUNDING.md",
+        "AGENTS.md",
+        ".agent/plan.md.tmpl",
+        ".devcontainer/devcontainer.json",
+        ".pre-commit-config.yaml",
+    ],
+    "S1": [
+        "GROUNDING.md",
+        "AGENTS.md",
+        ".agent/plan.md.tmpl",
+        ".devcontainer/devcontainer.json",
+        ".pre-commit-config.yaml",
+        ".github/workflows/verify.yml",
+        ".skills/",
+    ],
+    "S2": [
+        "GROUNDING.md",
+        "AGENTS.md",
+        ".agent/plan.md.tmpl",
+        ".devcontainer/devcontainer.json",
+        ".pre-commit-config.yaml",
+        ".github/workflows/verify.yml",
+        ".github/workflows/governance.yml",
+        ".skills/",
+        ".agent/eval/readiness.md",
+    ],
+    "S3": [
+        "GROUNDING.md",
+        "AGENTS.md",
+        ".agent/plan.md.tmpl",
+        ".devcontainer/devcontainer.json",
+        ".pre-commit-config.yaml",
+        ".github/workflows/verify.yml",
+        ".github/workflows/governance.yml",
+        ".skills/",
+        ".agent/eval/readiness.md",
+    ],
 }
 
 
@@ -112,7 +171,7 @@ def diff(repo: Path, stage: str | None = None) -> dict:
         stage = assess_repo.detect(repo)["stage"]
 
     missing: list[dict] = []
-    stale:   list[dict] = []
+    stale: list[dict] = []
     relaxed: list[dict] = []
 
     # core targets (filter by minimum required stage)
@@ -139,7 +198,14 @@ def diff(repo: Path, stage: str | None = None) -> dict:
         text = _read(repo / dest)
         miss_anchors = [a for a in anchors if a.lower() not in text.lower()]
         if miss_anchors:
-            stale.append({"path": dest, "missing_anchors": miss_anchors, "template": tmpl, "runtime": runtime})
+            stale.append(
+                {
+                    "path": dest,
+                    "missing_anchors": miss_anchors,
+                    "template": tmpl,
+                    "runtime": runtime,
+                }
+            )
         for rx in RELAX_PATTERNS:
             if rx.search(text):
                 relaxed.append({"path": dest, "pattern": rx.pattern, "runtime": runtime})

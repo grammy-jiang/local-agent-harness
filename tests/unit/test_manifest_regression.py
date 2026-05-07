@@ -46,14 +46,16 @@ def test_main_failures_return_one(empty_repo: Path, capsys: pytest.CaptureFixtur
     assert "[FAIL]" in out
 
 
-def test_main_pass_when_artifacts_minimal(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_pass_when_artifacts_minimal(
+    empty_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     """Build a minimal repo that satisfies every assertion."""
     scaffold_manifests.cmd_init(empty_repo, "S0", [], dry=False)
     # Render plan into expected location
-    plan_src = (empty_repo / ".agent" / "plan.md.tmpl")
+    plan_src = empty_repo / ".agent" / "plan.md.tmpl"
     assert plan_src.exists()
     # Add an HC bullet to GROUNDING.md (template already includes one)
-    g = (empty_repo / "GROUNDING.md")
+    g = empty_repo / "GROUNDING.md"
     text = g.read_text()
     if "- HC1" not in text:
         g.write_text(text + "\n- HC1: no plaintext secrets\n")

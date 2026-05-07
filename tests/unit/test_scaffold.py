@@ -17,7 +17,9 @@ def test_init_dry_run_does_not_write(empty_repo: Path, capsys: pytest.CaptureFix
     assert not (empty_repo / "GROUNDING.md").exists()
 
 
-def test_init_skips_existing_grounding(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_init_skips_existing_grounding(
+    empty_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     (empty_repo / "GROUNDING.md").write_text("preserved\n")
     scaffold_manifests.cmd_init(empty_repo, "S0", [], dry=False)
     assert (empty_repo / "GROUNDING.md").read_text() == "preserved\n"
@@ -47,7 +49,9 @@ def test_init_creates_skills_dir_at_S1(empty_repo: Path) -> None:
     assert (empty_repo / ".skills" / "_template.SKILL.md").exists()
 
 
-def test_init_S1_dry_does_not_create_skills(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_init_S1_dry_does_not_create_skills(
+    empty_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     scaffold_manifests.cmd_init(empty_repo, "S1", [], dry=True)
     out = capsys.readouterr().out
     assert "would create" in out
@@ -78,6 +82,7 @@ def test_gitignore_idempotent(empty_repo: Path, capsys: pytest.CaptureFixture[st
 
 def test_gitignore_dry_run(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
     from local_agent_harness.core import gitignore
+
     msg = gitignore.render_gitignore(empty_repo, dry=True)
     assert "would create" in msg
     assert not (empty_repo / ".gitignore").exists()
@@ -154,7 +159,9 @@ def test_refresh_renders_missing_when_apply(empty_repo: Path) -> None:
     assert (empty_repo / "AGENTS.md").exists()
 
 
-def test_refresh_dry_shows_plan_without_writing(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_refresh_dry_shows_plan_without_writing(
+    empty_repo: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     (empty_repo / "GROUNDING.md").write_text("stale\n")
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=False, dry=True)
     out = capsys.readouterr().out
@@ -176,9 +183,10 @@ def test_check_returns_zero_on_clean(empty_repo: Path, capsys: pytest.CaptureFix
 
 
 def test_main_init(empty_repo: Path) -> None:
-    rc = _run_main(scaffold_manifests, [
-        "--repo", str(empty_repo), "--mode", "init", "--runtime", "claude-code"
-    ])
+    rc = _run_main(
+        scaffold_manifests,
+        ["--repo", str(empty_repo), "--mode", "init", "--runtime", "claude-code"],
+    )
     assert rc == 0
     assert (empty_repo / "CLAUDE.md").exists()
 
@@ -200,7 +208,9 @@ def test_main_missing_repo(tmp_path: Path) -> None:
 
 
 def test_main_explicit_stage_passthrough(empty_repo: Path) -> None:
-    rc = _run_main(scaffold_manifests, ["--repo", str(empty_repo), "--stage", "S0", "--mode", "init"])
+    rc = _run_main(
+        scaffold_manifests, ["--repo", str(empty_repo), "--stage", "S0", "--mode", "init"]
+    )
     assert rc == 0
 
 
@@ -220,7 +230,9 @@ def test_refresh_stale_missing_dst() -> None:
     assert "missing" in msg
 
 
-def test_refresh_skips_when_template_none(empty_repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_refresh_skips_when_template_none(
+    empty_repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """`stale` entry without a 'template' key is filtered out."""
 
     fake_drift = {

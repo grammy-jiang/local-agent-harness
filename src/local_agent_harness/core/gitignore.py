@@ -7,6 +7,7 @@ Strategy:
      (toptal/gitignore API). Falls back to a minimal bundled default if offline.
   3. Append harness-specific paths that must always be excluded.
 """
+
 from __future__ import annotations
 
 import os
@@ -22,45 +23,45 @@ from pathlib import Path
 # (file/dir name or extension, gitignore.io keyword)
 _SIGNAL_KEYWORDS: list[tuple[str, str]] = [
     # languages / runtime
-    ("pyproject.toml",   "python"),
-    ("setup.py",         "python"),
-    ("setup.cfg",        "python"),
+    ("pyproject.toml", "python"),
+    ("setup.py", "python"),
+    ("setup.cfg", "python"),
     ("requirements.txt", "python"),
-    (".py",              "python"),
-    ("package.json",     "node"),
-    (".js",              "node"),
-    (".ts",              "node"),
-    (".tsx",             "react"),
-    (".jsx",             "react"),
-    ("go.mod",           "go"),
-    (".go",              "go"),
-    ("Cargo.toml",       "rust"),
-    (".rs",              "rust"),
-    ("pom.xml",          "java"),
-    ("build.gradle",     "java"),
-    (".java",            "java"),
-    (".kt",              "kotlin"),
-    ("Gemfile",          "ruby"),
-    (".rb",              "ruby"),
-    (".tf",              "terraform"),
-    (".swift",           "swift"),
-    (".cs",              "csharp"),
-    (".cpp",             "c++"),
-    (".c",               "c"),
+    (".py", "python"),
+    ("package.json", "node"),
+    (".js", "node"),
+    (".ts", "node"),
+    (".tsx", "react"),
+    (".jsx", "react"),
+    ("go.mod", "go"),
+    (".go", "go"),
+    ("Cargo.toml", "rust"),
+    (".rs", "rust"),
+    ("pom.xml", "java"),
+    ("build.gradle", "java"),
+    (".java", "java"),
+    (".kt", "kotlin"),
+    ("Gemfile", "ruby"),
+    (".rb", "ruby"),
+    (".tf", "terraform"),
+    (".swift", "swift"),
+    (".cs", "csharp"),
+    (".cpp", "c++"),
+    (".c", "c"),
     # IDEs / editors
-    (".vscode",          "visualstudiocode"),
-    (".idea",            "jetbrains"),
-    (".vim",             "vim"),
+    (".vscode", "visualstudiocode"),
+    (".idea", "jetbrains"),
+    (".vim", "vim"),
     # environment managers
-    (".venv",            "virtualenv"),
-    ("venv",             "virtualenv"),
-    (".python-version",  "pyenv"),
+    (".venv", "virtualenv"),
+    ("venv", "virtualenv"),
+    (".python-version", "pyenv"),
     # notebooks
-    (".ipynb",           "jupyternotebooks"),
+    (".ipynb", "jupyternotebooks"),
     # build / infra
-    ("Dockerfile",       "docker"),
+    ("Dockerfile", "docker"),
     ("docker-compose.yml", "docker"),
-    (".sh",              "linux"),
+    (".sh", "linux"),
     # OS — always included
 ]
 

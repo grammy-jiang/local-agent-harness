@@ -7,6 +7,7 @@ prompt material. Intended as a deterministic gate, not a security audit.
 Usage:
     python redaction_smoke.py [--repo PATH]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -16,15 +17,27 @@ from pathlib import Path
 # Synthetic markers a real secret should never look like. We search for these
 # in committed files; if any appear, the test fails.
 RED_MARKERS = [
-    re.compile(r"AKIA[0-9A-Z]{16}"),                     # AWS access key id pattern
+    re.compile(r"AKIA[0-9A-Z]{16}"),  # AWS access key id pattern
     re.compile(r"-----BEGIN (RSA|OPENSSH|EC) PRIVATE KEY-----"),
-    re.compile(r"xox[baprs]-[0-9A-Za-z-]{10,}"),         # Slack tokens
-    re.compile(r"ghp_[A-Za-z0-9]{30,}"),                 # GitHub PAT
-    re.compile(r"sk-[A-Za-z0-9]{20,}"),                  # OpenAI-style keys
+    re.compile(r"xox[baprs]-[0-9A-Za-z-]{10,}"),  # Slack tokens
+    re.compile(r"ghp_[A-Za-z0-9]{30,}"),  # GitHub PAT
+    re.compile(r"sk-[A-Za-z0-9]{20,}"),  # OpenAI-style keys
 ]
 
 SCAN_GLOBS = ["**/*.md", "**/*.yml", "**/*.yaml", "**/*.json", "**/*.toml", "**/*.ini", "**/*.env*"]
-SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "dist", "build", "target", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+SKIP_DIRS = {
+    ".git",
+    "node_modules",
+    ".venv",
+    "venv",
+    "dist",
+    "build",
+    "target",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+}
 
 
 def scan(repo: Path) -> list[tuple[Path, str]]:

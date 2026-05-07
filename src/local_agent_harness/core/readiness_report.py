@@ -8,6 +8,7 @@ When --check-no-regression is passed, the script compares the current score
 to the previous score recorded under `<HARNESS_SENTINEL>` in
 `.agent/eval/readiness.md` and exits non-zero if any axis dropped.
 """
+
 from __future__ import annotations
 
 import argparse

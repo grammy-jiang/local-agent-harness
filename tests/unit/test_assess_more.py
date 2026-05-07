@@ -57,14 +57,17 @@ def test_detect_S1_with_tests_no_tags(empty_repo: Path) -> None:
 def test_detect_S2_when_tagged(empty_repo: Path) -> None:
     _scaffold_S1(empty_repo)
     import subprocess
+
     subprocess.run(["git", "add", "-A"], cwd=empty_repo, check=True)
     subprocess.run(
         ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "x"],
-        cwd=empty_repo, check=True,
+        cwd=empty_repo,
+        check=True,
     )
     subprocess.run(
         ["git", "-c", "user.email=t@t", "-c", "user.name=t", "tag", "-a", "v0.1.0", "-m", "v0.1.0"],
-        cwd=empty_repo, check=True,
+        cwd=empty_repo,
+        check=True,
         env={"PATH": __import__("os").environ.get("PATH", ""), "GIT_EDITOR": "true"},
     )
     res = assess_repo.detect(empty_repo)
@@ -82,7 +85,10 @@ def test_detect_runtimes_listed(empty_repo: Path) -> None:
     (empty_repo / ".cursor" / "rules").write_text("x")
     res = assess_repo.detect(empty_repo)
     assert set(res["detected_runtimes"]) == {
-        "claude-code", "codex-cli", "copilot-cli", "cursor",
+        "claude-code",
+        "codex-cli",
+        "copilot-cli",
+        "cursor",
     }
 
 
@@ -115,14 +121,17 @@ def test_security_axis_full(empty_repo: Path, monkeypatch: pytest.MonkeyPatch) -
 
     fake_tools = {"gitleaks", "semgrep", "pip-audit"}
     monkeypatch.setattr(
-        assess_repo.shutil, "which",
+        assess_repo.shutil,
+        "which",
         lambda name: "/usr/bin/" + name if name in fake_tools else None,
     )
     res = assess_repo.detect(empty_repo)
     assert res["axes"]["security"] == 5
 
 
-def test_gitignore_unreadable_does_not_crash(empty_repo: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_gitignore_unreadable_does_not_crash(
+    empty_repo: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     (empty_repo / ".gitignore").write_text(".agent")
     real_read = Path.read_text
 
@@ -139,9 +148,11 @@ def test_gitignore_unreadable_does_not_crash(empty_repo: Path, monkeypatch: pyte
 
 def test_main_text_output(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
     (empty_repo / "CLAUDE.md").write_text("x")
-    rc = assess_repo.main_with_args(["--repo", str(empty_repo)]) if hasattr(
-        assess_repo, "main_with_args"
-    ) else _run_main(assess_repo, ["--repo", str(empty_repo)])
+    rc = (
+        assess_repo.main_with_args(["--repo", str(empty_repo)])
+        if hasattr(assess_repo, "main_with_args")
+        else _run_main(assess_repo, ["--repo", str(empty_repo)])
+    )
     out = capsys.readouterr().out
     assert rc == 0
     assert "Stage:" in out
@@ -152,6 +163,7 @@ def test_main_text_output(empty_repo: Path, capsys: pytest.CaptureFixture[str]) 
 def test_main_json_output(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
     rc = _run_main(assess_repo, ["--repo", str(empty_repo), "--json"])
     import json
+
     out = capsys.readouterr().out
     assert rc == 0
     data = json.loads(out)
@@ -168,6 +180,7 @@ def test_main_missing_repo(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -
 def _run_main(module, argv: list[str]) -> int:
     """Invoke a stdlib argparse `main()` with patched argv."""
     import sys
+
     saved = sys.argv
     sys.argv = [module.__name__, *argv]
     try:
