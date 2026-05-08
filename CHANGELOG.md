@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.5] — 2026-05-08
+
+### Fixed
+- `agents_builder.py`: removed duplicate `Network | denied by default` row
+  from the Scope Boundary table; HC4 in the Security section is the
+  authoritative declaration.
+- `runtime_overlay.py` (`_CLAUDE_MD`): replaced inline deny list with a
+  pointer to `.claude/settings.json` (the machine-enforceable source of
+  truth).
+- `runtime_overlay.py` (`render_copilot`): stopped generating
+  `.github/instructions/general.instructions.md`; its sole content
+  ("follow AGENTS.md") is redundant since Copilot reads `AGENTS.md`
+  natively.
+- Asset templates (`AGENTS.md.tmpl`, `CLAUDE.md.tmpl`) synced to match.
+
 ## [0.3.4] — 2026-05-08
 
 ### Changed
