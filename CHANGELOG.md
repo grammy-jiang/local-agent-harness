@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.6] — 2026-05-09
+
+### Added
+- `runtime_overlay.py`: `_build_copilot_instructions()` now generates
+  `.github/copilot-instructions.md` dynamically with project context
+  (overview, repo layout, detected tech stack, build/test/lint commands,
+  and harness validation commands) instead of a static placeholder.
+- `references/copilot-instructions-standard.md`: new reference document
+  explaining the AGENTS.md vs copilot-instructions.md distinction per
+  GitHub Copilot docs.
+
+### Fixed
+- `references/runtime-overlays.md`: corrected wrong file paths
+  (`.github/copilot-cli.md` → `.github/copilot-instructions.md`;
+  `.codex/config` → `.codex/INSTRUCTIONS.md`); added table explaining
+  the AGENTS.md / copilot-instructions.md split.
+- `copilot-cli.tmpl`: updated static refresh template to match the new
+  section structure.
+- `SKILL.md`: added reference to `copilot-instructions-standard.md`.
+
 ## [0.3.5] — 2026-05-08
 
 ### Fixed
