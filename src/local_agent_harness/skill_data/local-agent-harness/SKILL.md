@@ -46,7 +46,11 @@ layers may specialize but never relax lower-layer constraints.
 
 1. The **repository path** (default: cwd).
 2. The **target runtime(s)** — any of `claude-code`, `codex-cli`,
-   `copilot-cli` (auto-detected from existing files; otherwise ask).
+   `copilot-cli`. Resolved in priority order:
+   (1) personal config directories on this machine (`~/.claude` → `claude-code`,
+   `~/.copilot` → `copilot-cli`, `~/.codex` → `codex-cli`);
+   (2) existing runtime overlay files already in the repo;
+   (3) ask the user if nothing is detected at either level.
 3. The **operating mode** — `check`, `init`, or `refresh` (default: start
    with `check`).
 4. The **direction** to optimize — A, B, or both (default: both).
@@ -86,10 +90,27 @@ report the clean state to the user. Non-zero exit codes:
 - `1` — drift detected (`missing`, `stale`, or `out_of_stage` items).
 - `2` — `relaxed` items detected; refresh is **blocked** until cleared.
 
-### Step 2 — Confirm runtime(s) and direction
+### Step 2 — Detect installed AI agents and confirm runtime(s)
 
-If runtimes were not auto-detected (no `CLAUDE.md`, no `.codex/config`, etc.),
-ask once which to render. Default to both directions.
+Before asking the user, probe the machine for installed AI agents by checking
+personal config directories:
+
+```bash
+# Each directory's presence means the corresponding agent is installed
+ls ~/.claude   # → claude-code
+ls ~/.copilot  # → copilot-cli
+ls ~/.codex    # → codex-cli
+```
+
+Apply this decision tree:
+
+| Machine detection result | Action |
+|---|---|
+| **No** config dirs found | Fall back to repo-level detection (existing `CLAUDE.md`, `.codex/INSTRUCTIONS.md`, `.github/copilot-instructions.md`); if still nothing, ask the user which runtimes to render. |
+| **Exactly one** config dir found | Use that runtime silently — no question needed. |
+| **Two or more** config dirs found | Ask the user: *"Detected [X, Y] installed on this machine. Which should be supported in this repo? (default: all)"* Accept their selection or confirm the default. |
+
+Default to both directions (A and B).
 
 ### Step 3 — Choose mode and act
 
@@ -183,10 +204,12 @@ The skill is not done until, for the target repo:
 
 ### Example 1 — Empty Python repo (init S0 → S1)
 User: "Make this empty repo ready for Claude Code."
-1. `local-agent-harness assess` → `stage=S0`.
-2. `local-agent-harness check` → all required artifacts `missing`.
-3. `local-agent-harness init --runtime claude-code` renders the spine.
-4. `local-agent-harness validate` passes; readiness ≈ 6/25; next-stage
+1. Check machine: `~/.claude` exists → `claude-code` detected; `~/.copilot` and `~/.codex` absent.
+2. Exactly one runtime detected — proceed silently with `claude-code`.
+3. `local-agent-harness assess` → `stage=S0`.
+4. `local-agent-harness check` → all required artifacts `missing`.
+5. `local-agent-harness init --runtime claude-code` renders the spine.
+6. `local-agent-harness validate` passes; readiness ≈ 6/25; next-stage
    list = add tests + CI.
 
 ### Example 2 — Node service with tests, AGENTS.md exists but stale (refresh)
@@ -213,6 +236,20 @@ User: "Refresh our harness."
    `.pre-commit-config.yaml` and exits with code 2.
 2. Skill stops, prints the offending pattern and file, and refuses to
    `refresh --apply` until the user removes the relaxation.
+
+### Example 5 — Developer machine with all three agents installed
+User: "Initialize this repo."
+1. Check machine: `~/.claude` ✓, `~/.copilot` ✓, `~/.codex` ✓ — all three detected.
+2. Ask user: *"Detected claude-code, copilot-cli, codex-cli installed on this
+   machine. Which should be supported in this repo? (default: all)"*
+3. User confirms default (all three).
+4. `local-agent-harness assess` → `stage=S0`.
+5. `local-agent-harness check` → all artifacts `missing`.
+6. `local-agent-harness init --runtime claude-code --runtime copilot-cli --runtime codex-cli`
+   renders AGENTS.md, CLAUDE.md, .claude/settings.json,
+   .github/copilot-instructions.md, .codex/INSTRUCTIONS.md, devcontainer,
+   pre-commit, .gitignore.
+7. `local-agent-harness validate` passes.
 
 ## Troubleshooting
 
