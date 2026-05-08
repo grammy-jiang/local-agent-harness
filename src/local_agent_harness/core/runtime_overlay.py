@@ -26,7 +26,6 @@ from pathlib import Path
 from typing import Any
 
 from . import agents_builder as _agents_builder
-from ._paths import assets_dir as _assets_dir
 
 # ---------------------------------------------------------------------------
 # Shared helpers
