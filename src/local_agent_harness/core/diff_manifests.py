@@ -86,11 +86,11 @@ OVERLAYS = {
         "CLAUDE.md",
         ["Permission ladder", "claude-code-only"],
     ),
-    "codex-cli": ("runtime-overlays/codex.config.tmpl", ".codex/INSTRUCTIONS.md", ["AGENTS.md"]),
+    "codex-cli": ("runtime-overlays/codex.config.tmpl", ".codex/INSTRUCTIONS.md", ["Codex-specific settings", "Stop conditions"]),
     "copilot-cli": (
         "runtime-overlays/copilot-cli.tmpl",
         ".github/copilot-instructions.md",
-        ["AGENTS.md", "Copilot"],
+        ["Copilot-specific guidance", "Stop conditions"],
     ),
 }
 

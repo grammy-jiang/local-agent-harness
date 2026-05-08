@@ -190,3 +190,34 @@ HC1–HC6 were therefore unreachable by all three agents.
 | `core/scaffold_manifests.py` | `GROUNDING.md` removed from `CORE_FILES`; default-runtimes fallback added |
 | `cli/cmd_init.py` | Default-runtimes fallback added for non-interactive mode |
 | `tests/**` | All GROUNDING.md references updated; `test_main_init_no_runtime_creates_all_overlays` added |
+
+---
+
+## Follow-up: Remove redundant "read AGENTS.md" prose from overlays
+
+After the initial fixes, a further redundancy was identified: both
+`.github/copilot-instructions.md` and `.codex/INSTRUCTIONS.md` contained
+boilerplate telling the agent to read `AGENTS.md`.  Since both Copilot and
+Codex already read `AGENTS.md` natively (see findings table), this prose was
+noise at best and misleading at worst.
+
+### What was removed
+
+- **`.github/copilot-instructions.md`** (`_COPILOT_INSTRUCTIONS` / `copilot-cli.tmpl`):
+  Removed "Primary instructions: AGENTS.md" section (the 5-bullet list
+  summarising what is inside AGENTS.md).  The file now contains only
+  Copilot-specific guidance and stop conditions.
+
+- **`.codex/INSTRUCTIONS.md`** (`_CODEX_INSTRUCTIONS` / `codex.config.tmpl`):
+  Replaced the placeholder "Codex reads AGENTS.md — edit that file instead"
+  content with actual Codex-specific settings (approval mode, max turns,
+  sandbox, transcript path) and stop conditions.
+
+### Files changed (follow-up commit)
+
+| File | Change |
+|---|---|
+| `core/runtime_overlay.py` | `_COPILOT_INSTRUCTIONS`: removed AGENTS.md pointer; `_CODEX_INSTRUCTIONS`: replaced placeholder with real Codex settings |
+| `assets/runtime-overlays/copilot-cli.tmpl` | Synced to match `_COPILOT_INSTRUCTIONS` |
+| `assets/runtime-overlays/codex.config.tmpl` | Synced to match `_CODEX_INSTRUCTIONS` (Markdown, not TOML) |
+| `core/diff_manifests.py` | Drift anchors updated: codex `["Codex-specific settings", "Stop conditions"]`; copilot `["Copilot-specific guidance", "Stop conditions"]` |

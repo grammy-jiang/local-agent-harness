@@ -148,40 +148,31 @@ def render_claude_code(repo: Path, dry: bool) -> list[str]:
 # GitHub Copilot
 # ---------------------------------------------------------------------------
 
-# GitHub Copilot does not support @import syntax, so we reference AGENTS.md
-# explicitly and add Copilot-specific guidance after the pointer.
+# Copilot reads AGENTS.md natively, so this file contains only
+# Copilot-specific behaviour that does not belong in AGENTS.md.
 _COPILOT_INSTRUCTIONS = """\
 <!-- .github/copilot-instructions.md                                          -->
 <!-- Repository-wide custom instructions for GitHub Copilot                   -->
 <!-- Docs: https://docs.github.com/en/copilot/customizing-copilot             -->
 <!--                                                                           -->
-<!-- DRY principle: AGENTS.md (repo root) is the single source of truth for   -->
-<!-- build commands, test commands, conventions, and scope boundaries.         -->
-<!-- This file adds Copilot-specific pointers and supplements only.            -->
-
-## Primary instructions: AGENTS.md
-
-The complete agent instructions are in **`AGENTS.md`** at the repository root.
-Read it before making any change.  It contains:
-
-- Build and test commands
-- Coding conventions and style rules
-- Scope boundary (which paths may be written)
-- Security and data-classification policies
-- PR checklist
+<!-- Copilot reads AGENTS.md natively.  This file adds only Copilot-specific  -->
+<!-- supplements that cannot live in AGENTS.md.                                -->
 
 ## Copilot-specific guidance
 
-- Always run the test suite and linter after every change (commands in
-  `AGENTS.md § Testing` and `AGENTS.md § Lint and Format`).
+- Always run the test suite and linter after every change.
 - Never push directly to `main`; open a pull request.
-- Follow the commit message convention documented in `AGENTS.md`.
 - Keep pull requests small and focused; split unrelated changes into separate
   PRs.
 - Include tests for every new function and every bug fix.
 - When generating new code, match the style and patterns already in use.
 - If a change requires a dependency update, call it out explicitly in the PR
   description.
+
+## Stop conditions
+
+- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
+- Out-of-scope write: abort + revert + report.
 """
 
 _COPILOT_GENERAL_INSTRUCTIONS = """\
@@ -222,28 +213,24 @@ def render_copilot(repo: Path, dry: bool) -> list[str]:
 # OpenAI Codex CLI
 # ---------------------------------------------------------------------------
 
-# Codex CLI reads AGENTS.md natively (agents.md standard).
-# We create .codex/INSTRUCTIONS.md purely as a "what to edit" guide for
-# humans who open the .codex/ folder.
+# Codex CLI reads AGENTS.md natively.  This file adds only Codex-specific
+# settings that cannot live in AGENTS.md.
 _CODEX_INSTRUCTIONS = """\
-# Codex CLI — project context
+<!-- .codex/INSTRUCTIONS.md                                                   -->
+<!-- Codex CLI-specific supplements.  Codex reads AGENTS.md natively.         -->
+<!-- This file adds only Codex CLI-specific behaviour.                         -->
 
-OpenAI Codex CLI reads **`AGENTS.md`** (repository root) automatically.
+## Codex-specific settings
 
-**Do not duplicate instructions here.**  Edit `AGENTS.md` instead.
+- Default approval mode: `suggest` (confirm each edit before writing).
+- Max turns per session: 40.
+- Sandbox: devcontainer; network egress denied by default.
+- Session transcripts: `.agent/logs/`.
 
-For Codex CLI–specific runtime settings (model, approval mode, sandbox
-configuration), see the [Codex documentation](https://developers.openai.com/codex).
+## Stop conditions
 
-## Quick reference
-
-| What to change            | Where to change it       |
-|---------------------------|--------------------------|
-| Build / test / lint cmds  | `AGENTS.md`              |
-| Coding conventions        | `AGENTS.md`              |
-| Scope boundary            | `AGENTS.md`              |
-| Model / approval mode     | `~/.codex/config.toml`   |
-| Project-level MCP servers | (Codex does not support) |
+- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
+- Out-of-scope write: abort + revert + report.
 """
 
 

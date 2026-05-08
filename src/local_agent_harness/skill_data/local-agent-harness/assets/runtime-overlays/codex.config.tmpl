@@ -1,26 +1,15 @@
-# .codex/config — OpenAI Codex CLI overlay
-#
-# Specializes AGENTS.md for Codex CLI.  Never relaxes GROUNDING.md.
-# Shared context (build commands, conventions, scope boundary) lives in
-# AGENTS.md.  This file adds only Codex CLI–specific settings.
+<!-- .codex/INSTRUCTIONS.md                                                   -->
+<!-- Codex CLI-specific supplements.  Codex reads AGENTS.md natively.         -->
+<!-- This file adds only Codex CLI-specific behaviour.                         -->
 
-[runtime]
-approval_mode = "suggest"   # suggest | auto-edit | full-auto
-model         = "<model-id>"
-max_turns     = 40
+## Codex-specific settings
 
-[sandbox]
-type        = "devcontainer"
-network     = "deny"        # set to "allowlist" with [sandbox.allowlist]
+- Default approval mode: `suggest` (confirm each edit before writing).
+- Max turns per session: 40.
+- Sandbox: devcontainer; network egress denied by default.
+- Session transcripts: `.agent/logs/`.
 
-[paths]
-# See AGENTS.md §Scope Boundary for the canonical list.
-write_allow = ["src/", "tests/", "docs/", ".agent/plan.md"]
-write_deny  = ["secrets/", ".env*", "**/id_rsa*"]
+## Stop conditions
 
-[commands]
-allow = ["pytest", "ruff", "mypy", "git diff", "git status"]
-deny  = ["rm -rf", "git push --force", "npm publish"]
-
-[telemetry]
-session_log = ".agent/logs/"
+- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
+- Out-of-scope write: abort + revert + report.

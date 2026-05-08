@@ -1,23 +1,22 @@
-# .github/copilot-cli.md — GitHub Copilot CLI overlay
-#
-# Specializes AGENTS.md for Copilot CLI.  Never relaxes GROUNDING.md.
-# Shared context (build commands, conventions, scope boundary) lives in
-# AGENTS.md.  This file adds only Copilot CLI–specific behaviour.
+<!-- .github/copilot-instructions.md                                          -->
+<!-- Repository-wide custom instructions for GitHub Copilot                   -->
+<!-- Docs: https://docs.github.com/en/copilot/customizing-copilot             -->
+<!--                                                                           -->
+<!-- Copilot reads AGENTS.md natively.  This file adds only Copilot-specific  -->
+<!-- supplements that cannot live in AGENTS.md.                                -->
 
-## Permission posture
-- Default: confirm before destructive actions.
-- Branch protection: required on `main`.
-- Sandbox: rely on devcontainer; do not run on host for untrusted repos.
+## Copilot-specific guidance
 
-## Tool surface
-- Read/search/edit are unrestricted within scope.
-- `bash` is allowlisted to: `<commands>`.
-- Network calls go through the sandbox; egress allowlist documented in `AGENTS.md`.
-
-## Session evidence
-- Session transcripts under `.agent/logs/`.
-- PR description must link the transcript and the `plan.md`.
+- Always run the test suite and linter after every change.
+- Never push directly to `main`; open a pull request.
+- Keep pull requests small and focused; split unrelated changes into separate
+  PRs.
+- Include tests for every new function and every bug fix.
+- When generating new code, match the style and patterns already in use.
+- If a change requires a dependency update, call it out explicitly in the PR
+  description.
 
 ## Stop conditions
-- Doom-loop detection: if the same tool is called 5× with similar args, stop.
-- Out-of-scope write attempts: abort + revert + report.
+
+- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
+- Out-of-scope write: abort + revert + report.
