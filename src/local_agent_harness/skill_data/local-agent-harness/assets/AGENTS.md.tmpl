@@ -59,8 +59,8 @@ All hard constraints are enforced at every stage and may never be relaxed.
 | Amber | Internal source, non-PII configs | yes (redact tokens) | redacted |
 | Red | Secrets, PII, customer data, keys | **no** | **no** |
 
-Use `gitleaks` pre-commit hook.  Run `local-agent-harness validate` before
-every PR to enforce these constraints.
+Use `gitleaks` pre-commit hook. Run the harness validation gate before every
+PR (command in build/validation commands — see `copilot-instructions.md`).
 
 ## Stop Conditions
 
