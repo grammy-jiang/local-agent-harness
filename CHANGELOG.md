@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.8] — 2026-05-09
+
+### Changed
+- `SKILL.md` Step 2: skill now probes `~/.claude`, `~/.copilot`, and
+  `~/.codex` to detect installed AI agents before asking the user which
+  runtimes to target. Zero dirs → fall back to repo detection; one dir →
+  use silently; two or more → ask with all detected as default.
+- `SKILL.md`: updated Example 1 to show machine-detection flow; added
+  Example 5 (all three agents installed) illustrating the multi-agent
+  confirmation prompt.
+
 ## [0.3.7] — 2026-05-09
 
 ### Fixed
