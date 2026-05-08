@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.9] — 2026-05-09
+
+### Fixed
+- `AGENTS.md.tmpl`: added `.gitignore` convention ("do not hand-edit the
+  harness-managed section") — a behavioral constraint that belongs in the
+  agent spine, not in project-context files.
+- `copilot-cli.tmpl`: removed the same rule from the Notes section
+  (was duplicated in the wrong file).
+
 ## [0.3.8] — 2026-05-09
 
 ### Changed
