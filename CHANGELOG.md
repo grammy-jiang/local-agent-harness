@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-05-08
+
+### Removed
+- **`GROUNDING.md`** is no longer generated or required. Hard constraints
+  (HC1–HC6) are now inlined directly into `AGENTS.md` so every AI agent
+  that reads `AGENTS.md` picks them up without a separate file.
+
+### Fixed
+- `assess_repo.py` overlay-detection paths corrected:
+  `.codex/config` → `.codex/INSTRUCTIONS.md` and
+  `.github/copilot-cli.md` → `.github/copilot-instructions.md`.
+- `cmd_init` / `scaffold_manifests.main()` now auto-detect existing overlay
+  runtimes when `--runtime` is not supplied; fall back to all three
+  (`claude-code`, `codex-cli`, `copilot-cli`) for greenfield repos.
+- `manifest_regression.py` now verifies HC\* and secrets wording in
+  `AGENTS.md` instead of the removed `GROUNDING.md`.
+- `governance.yml.tmpl` updated to guard `AGENTS.md` instead of `GROUNDING.md`.
+
+### Added
+- ADR-001: documents the agent instruction-file discovery findings and the
+  resulting path corrections.
+
 ## [0.2.1] — 2026-05-08
 
 ### Fixed
