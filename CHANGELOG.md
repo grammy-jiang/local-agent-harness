@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.10] — 2026-05-09
+
+### Fixed
+- `runtime_overlay.py` / `copilot-cli.tmpl`: removed project build/test/lint
+  commands from `copilot-instructions.md` (AGENTS.md is the authoritative
+  source all runtimes read natively); only harness-specific validation commands
+  remain in the Copilot file.
+- `agents_builder.py`: `from __future__ import annotations` convention is now
+  only added to AGENTS.md when Python is detected in the stack; non-Python
+  repos no longer receive a Python-specific convention.
+- `agents_builder.py` / `AGENTS.md.tmpl`: synced the programmatic static block
+  with the template — richer HC3–HC6 descriptions, data classification table
+  (Green/Amber/Red), and `.gitignore` managed-section note all now match.
+
 ## [0.3.9] — 2026-05-09
 
 ### Fixed
