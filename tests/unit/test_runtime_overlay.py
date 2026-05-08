@@ -164,18 +164,31 @@ def test_render_claude_code_settings_valid_json(tmp_path: Path) -> None:
 
 
 def test_render_copilot_creates_files(tmp_path: Path) -> None:
-    msgs = runtime_overlay.render_copilot(tmp_path, dry=False)
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        msgs = runtime_overlay.render_copilot(tmp_path, dry=False)
     assert len(msgs) == 1
     instructions = tmp_path / ".github" / "copilot-instructions.md"
     assert instructions.exists()
-    assert "AGENTS.md" in instructions.read_text()
-    # general.instructions.md is NOT generated — Copilot reads AGENTS.md natively
+    content = instructions.read_text()
+    # Must mention AGENTS.md (for the Copilot-specific guidance note)
+    assert "AGENTS.md" in content
+    # Must have required sections for harness check
+    assert "Copilot-specific guidance" in content
+    # Must have project-context sections
+    assert "Repository Overview" in content
+    assert "Build & Validation Commands" in content
+    # general.instructions.md is NOT generated — behavioral rules live in AGENTS.md
     general = tmp_path / ".github" / "instructions" / "general.instructions.md"
     assert not general.exists()
 
 
 def test_render_copilot_dry_run(tmp_path: Path) -> None:
-    msgs = runtime_overlay.render_copilot(tmp_path, dry=True)
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        msgs = runtime_overlay.render_copilot(tmp_path, dry=True)
     assert not (tmp_path / ".github").exists()
     assert len(msgs) == 1
     assert all("would render:" in m for m in msgs)
@@ -186,16 +199,59 @@ def test_render_copilot_skips_existing(tmp_path: Path) -> None:
     gh.mkdir()
     instr = gh / "copilot-instructions.md"
     instr.write_text("custom")
-    msgs = runtime_overlay.render_copilot(tmp_path, dry=False)
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        msgs = runtime_overlay.render_copilot(tmp_path, dry=False)
     assert len(msgs) == 1
     assert "skip" in msgs[0]
     assert instr.read_text() == "custom"
 
 
 def test_render_copilot_references_agents_md(tmp_path: Path) -> None:
-    runtime_overlay.render_copilot(tmp_path, dry=False)
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
     content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
     assert "AGENTS.md" in content
+
+
+def test_render_copilot_includes_project_context_sections(tmp_path: Path) -> None:
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
+    content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    for section in ("Repository Overview", "Tech Stack", "Project Layout",
+                    "Build & Validation Commands", "Copilot-specific guidance"):
+        assert section in content, f"Missing section: {section}"
+
+
+def test_render_copilot_includes_detected_commands(tmp_path: Path) -> None:
+    info = _empty_info()
+    info["stack"] = ["Python"]
+    info["test_cmds"] = ["pytest"]
+    info["lint_cmds"] = ["ruff check src"]
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=info
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
+    content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    assert "Python" in content
+    assert "pytest" in content
+    assert "ruff check src" in content
+
+
+def test_render_copilot_includes_harness_commands(tmp_path: Path) -> None:
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
+    content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    assert "local-agent-harness check" in content
+    assert "local-agent-harness validate" in content
+    assert "pre-commit" in content
 
 
 # ---------------------------------------------------------------------------
@@ -240,7 +296,10 @@ def test_render_runtime_claude_code(tmp_path: Path) -> None:
 
 
 def test_render_runtime_copilot_cli(tmp_path: Path) -> None:
-    msgs = runtime_overlay.render_runtime("copilot-cli", tmp_path, dry=True)
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        msgs = runtime_overlay.render_runtime("copilot-cli", tmp_path, dry=True)
     assert len(msgs) == 1
 
 

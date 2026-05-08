@@ -1,13 +1,51 @@
-<!-- .github/copilot-instructions.md                                          -->
-<!-- Repository-wide custom instructions for GitHub Copilot                   -->
-<!-- Docs: https://docs.github.com/en/copilot/customizing-copilot             -->
-<!--                                                                           -->
-<!-- Shared conventions, stop conditions, scope boundary, and PR checklist    -->
-<!-- all live in AGENTS.md — Copilot reads that file natively.                -->
-<!-- Add only Copilot-specific supplements below.                              -->
+# Repository Overview
+
+_TODO: add a brief description of what this repository does._
+
+## Tech Stack
+
+_Languages, frameworks, runtimes — e.g., Python 3.12, FastAPI, Node.js 20_
+
+## Project Layout
+
+```
+.
+├── src/          # Application source code
+├── tests/        # Test suite
+├── docs/         # Documentation
+└── ...           # Add actual layout when source code is added
+```
+
+## Build & Validation Commands
+
+```bash
+# Setup
+# <install command>
+
+# Test
+# <test command>
+
+# Lint / Format
+# <lint command>
+
+# Agent harness
+local-agent-harness check --repo .
+local-agent-harness validate --repo .
+
+# Pre-commit
+pre-commit install       # first time only
+pre-commit run --all-files
+```
 
 ## Copilot-specific guidance
 
-<!-- All shared rules (conventions, testing, style, PR checklist, stop
-     conditions) are defined in AGENTS.md and apply to Copilot natively.
-     Add Copilot-only supplements here if needed in future. -->
+<!-- Add Copilot-only supplements here as the project grows
+     (e.g., code review focus areas, chat response preferences).
+     Behavioral constraints, scope boundaries, stop conditions,
+     and PR checklist live in AGENTS.md. -->
+
+## Notes
+
+- `.agent/eval/` is gitignored; readiness reports are local only.
+- `.gitignore` is managed by `local-agent-harness`; do not hand-edit
+  the section below the `# local-agent-harness` marker.

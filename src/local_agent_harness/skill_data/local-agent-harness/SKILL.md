@@ -246,6 +246,8 @@ Cause: file path or naming differs across versions. See
 - `references/tool-dag-patterns.md` — read/search/edit/execute split.
 - `references/memory-governance.md` — three tiers, schema-grounded.
 - `references/verify-gate-catalog.md` — the gate sequence.
-- `references/runtime-overlays.md` — Claude Code / Codex / Copilot paths.
+- `references/runtime-overlays.md` — Claude Code / Codex / Copilot file paths and the key AGENTS.md vs. copilot-instructions.md distinction.
+- `references/copilot-instructions-standard.md` — GitHub Copilot documentation on what belongs in copilot-instructions.md (project context) vs. AGENTS.md (behavioral rules).
+- `references/agents-md-standard.md` — the agents.md open standard (https://agents.md/).
 - `references/manifest-anti-patterns.md` — relaxed-HC patterns and fixes.
 - `references/source-mapping.md` — links to the research vault.

@@ -3,18 +3,23 @@
 
 DRY principle
 -------------
-``AGENTS.md`` (repository root) is the **single source of truth** for build
-commands, test commands, conventions, and scope boundaries.  Every
-overlay file either imports ``AGENTS.md`` directly (Claude Code), explicitly
-references it (GitHub Copilot), or defers to it completely (Codex).
+``AGENTS.md`` is the single source of truth for **behavioral rules**:
+hard constraints, scope boundaries, stop conditions, and PR checklist.
+Every runtime overlay either imports AGENTS.md directly (Claude Code) or
+defers to it (Codex, Copilot).
+
+``copilot-instructions.md`` serves a different purpose: **project context**
+for all GitHub Copilot features (Chat, Code Review, Cloud Agent).  It
+describes what the project is, how to build/test/validate it, and where
+things live — not how the agent should behave.  See:
+  references/copilot-instructions-standard.md
 
 Supported runtimes
 ------------------
 * ``claude-code``   → ``CLAUDE.md`` (with ``@AGENTS.md`` import) +
                       ``.claude/settings.json`` (project permissions)
-* ``copilot-cli``   → ``.github/copilot-instructions.md`` (repo-wide) +
-                      ``.github/instructions/general.instructions.md``
-* ``codex-cli``     → ``.codex/INSTRUCTIONS.md`` (pointer to AGENTS.md)
+* ``copilot-cli``   → ``.github/copilot-instructions.md`` (project context)
+* ``codex-cli``     → ``.codex/INSTRUCTIONS.md`` (Codex-specific supplements)
 
 None of these functions overwrite a file that already exists.
 """
@@ -147,34 +152,110 @@ def render_claude_code(repo: Path, dry: bool) -> list[str]:
 # GitHub Copilot
 # ---------------------------------------------------------------------------
 
-# Copilot reads AGENTS.md natively, so this file contains only
-# Copilot-specific behaviour that does not belong in AGENTS.md.
-_COPILOT_INSTRUCTIONS = """\
-<!-- .github/copilot-instructions.md                                          -->
-<!-- Repository-wide custom instructions for GitHub Copilot                   -->
-<!-- Docs: https://docs.github.com/en/copilot/customizing-copilot             -->
-<!--                                                                           -->
-<!-- Shared conventions, stop conditions, scope boundary, and PR checklist    -->
-<!-- all live in AGENTS.md — Copilot reads that file natively.                -->
-<!-- Add only Copilot-specific supplements below.                              -->
+# .github/copilot-instructions.md provides **project context** for all GitHub
+# Copilot features (Chat, Code Review, Cloud Agent).  Behavioral rules
+# (hard constraints, scope, stop conditions, PR checklist) all live in AGENTS.md.
+# Reference: references/copilot-instructions-standard.md
 
-## Copilot-specific guidance
 
-<!-- All shared rules (conventions, testing, style, PR checklist, stop
-     conditions) are defined in AGENTS.md and apply to Copilot natively.
-     Add Copilot-only supplements here if needed in future. -->
-"""
+def _repo_layout_tree(repo: Path) -> str:
+    """Return a minimal top-level directory tree string for the repo."""
+    _skip = {
+        ".git", "__pycache__", ".mypy_cache", ".ruff_cache",
+        ".pytest_cache", ".coverage", "dist", "build", ".eggs",
+        ".venv", "node_modules", ".tox",
+    }
+    try:
+        entries = sorted(
+            [p for p in repo.iterdir() if p.name not in _skip],
+            key=lambda p: (p.is_file(), p.name.lstrip(".")),
+        )
+    except PermissionError:
+        return "."
+    lines = ["."]
+    for i, p in enumerate(entries):
+        connector = "└── " if i == len(entries) - 1 else "├── "
+        lines.append(f"{connector}{p.name}{'/' if p.is_dir() else ''}")
+    return "\n".join(lines)
+
+
+def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
+    """Build .github/copilot-instructions.md content from detected project info.
+
+    Follows the GitHub Copilot documentation:
+    https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/
+    add-custom-instructions/add-repository-instructions
+
+    This file provides **project context** (what the repo is, how to build/
+    test/validate, where things live) — not behavioral rules (those are in
+    AGENTS.md).
+    """
+    stack_str = (
+        ", ".join(info["stack"])
+        if info["stack"]
+        else "Not yet determined — update this section when source code is added."
+    )
+
+    # Build validation commands block
+    all_cmds: list[str] = []
+    for label, cmds in [
+        ("# Setup", info.get("install_cmds", [])),
+        ("# Build", info.get("build_cmds", [])),
+        ("# Test", info.get("test_cmds", [])),
+        ("# Lint / Format", info.get("lint_cmds", []) + info.get("format_cmds", [])),
+    ]:
+        if cmds:
+            all_cmds.append(label)
+            all_cmds.extend(cmds)
+            all_cmds.append("")
+
+    # Always include harness commands
+    all_cmds += [
+        "# Agent harness",
+        "local-agent-harness check --repo .",
+        "local-agent-harness validate --repo .",
+        "",
+        "# Pre-commit",
+        "pre-commit install       # first time only",
+        "pre-commit run --all-files",
+    ]
+
+    cmds_block = "```bash\n" + "\n".join(all_cmds).rstrip() + "\n```"
+
+    layout = _repo_layout_tree(repo)
+
+    return (
+        "# Repository Overview\n\n"
+        "_TODO: add a brief description of what this repository does._\n\n"
+        "## Tech Stack\n\n"
+        f"{stack_str}\n\n"
+        "## Project Layout\n\n"
+        f"```\n{layout}\n```\n\n"
+        "## Build & Validation Commands\n\n"
+        f"{cmds_block}\n\n"
+        "## Copilot-specific guidance\n\n"
+        "<!-- Add Copilot-only supplements here as the project grows\n"
+        "     (e.g., code review focus areas, chat response preferences).\n"
+        "     Behavioral constraints, scope boundaries, stop conditions,\n"
+        "     and PR checklist live in AGENTS.md. -->\n\n"
+        "## Notes\n\n"
+        "- `.agent/eval/` is gitignored; readiness reports are local only.\n"
+        "- `.gitignore` is managed by `local-agent-harness`; do not hand-edit\n"
+        "  the section below the `# local-agent-harness` marker.\n"
+    )
+
 
 def render_copilot(repo: Path, dry: bool) -> list[str]:
-    """Create ``.github/copilot-instructions.md``.
+    """Create ``.github/copilot-instructions.md`` if missing.
 
-    Copilot reads AGENTS.md natively, so no ``general.instructions.md``
-    pointer is needed — it would only duplicate what AGENTS.md already says.
+    Generates project-context content per the GitHub Copilot documentation.
+    Behavioral rules (hard constraints, scope, PR checklist) are in AGENTS.md.
     """
+    info = _agents_builder.detect_project_info(repo)
     return [
         _write_if_missing(
             repo / ".github" / "copilot-instructions.md",
-            _COPILOT_INSTRUCTIONS,
+            _build_copilot_instructions(repo, info),
             dry,
         ),
     ]
