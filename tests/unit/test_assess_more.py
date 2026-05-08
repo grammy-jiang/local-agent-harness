@@ -78,9 +78,9 @@ def test_detect_S2_when_tagged(empty_repo: Path) -> None:
 def test_detect_runtimes_listed(empty_repo: Path) -> None:
     (empty_repo / "CLAUDE.md").write_text("x")
     (empty_repo / ".codex").mkdir()
-    (empty_repo / ".codex" / "config").write_text("x")
+    (empty_repo / ".codex" / "INSTRUCTIONS.md").write_text("x")
     (empty_repo / ".github").mkdir()
-    (empty_repo / ".github" / "copilot-cli.md").write_text("x")
+    (empty_repo / ".github" / "copilot-instructions.md").write_text("x")
     res = assess_repo.detect(empty_repo)
     assert set(res["detected_runtimes"]) == {
         "claude-code",
@@ -91,7 +91,6 @@ def test_detect_runtimes_listed(empty_repo: Path) -> None:
 
 def test_axes_climb_with_artifacts(empty_repo: Path) -> None:
     (empty_repo / "AGENTS.md").write_text("x")
-    (empty_repo / "GROUNDING.md").write_text("x")
     (empty_repo / "CLAUDE.md").write_text("x")  # overlay
     (empty_repo / ".skills").mkdir()
     (empty_repo / "scripts").mkdir()

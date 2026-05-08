@@ -12,12 +12,11 @@ jobs:
       - name: Verify manifests present
         run: |
           test -f AGENTS.md
-          test -f GROUNDING.md
-      - name: Forbid scope-relaxing edits to GROUNDING.md
+      - name: Forbid removal of hard constraints from AGENTS.md
         run: |
-          if git --no-pager diff origin/${{ github.base_ref }}...HEAD -- GROUNDING.md \
+          if git --no-pager diff origin/${{ github.base_ref }}...HEAD -- AGENTS.md \
               | grep -E '^-.*HC[0-9]+'; then
-            echo "Hard constraint removed from GROUNDING.md - blocked." >&2
+            echo "Hard constraint removed from AGENTS.md - blocked." >&2
             exit 1
           fi
       - name: AI-readiness must not regress

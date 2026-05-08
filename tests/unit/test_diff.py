@@ -67,9 +67,9 @@ def test_print_human_all_categories(capsys: pytest.CaptureFixture[str]) -> None:
             "missing": [{"path": "AGENTS.md", "template": "AGENTS.md.tmpl"}],
             "stale": [
                 {
-                    "path": "GROUNDING.md",
+                    "path": "AGENTS.md",
                     "missing_anchors": ["X", "Y"],
-                    "template": "GROUNDING.md.tmpl",
+                    "template": "AGENTS.md.tmpl",
                 }
             ],
             "relaxed": [{"path": "CLAUDE.md", "pattern": "allow secrets"}],

@@ -1,7 +1,7 @@
 # AGENTS.md
 
 > Agent instructions for this repository.
-> See also: `GROUNDING.md` (hard constraints), `.agent/plan.md` (session plan).
+> See also: `.agent/plan.md` (session plan).
 
 <!-- local-agent-harness:auto:begin -->
 <!-- stack: general -->
@@ -33,10 +33,30 @@ _No lint/format commands detected — add them here._
 | Execute | see `.agent/policies/commands.allowlist` |
 | Network | denied by default |
 
-## Security
+## Security and Hard Constraints
 
-See `GROUNDING.md` for hard constraints (HC1–HC6).  No plaintext secrets
-in source, logs, or prompts.  Use `gitleaks` pre-commit hook.
+All hard constraints are enforced at every stage and may never be relaxed.
+
+- **HC1** — No plaintext secrets in repository, prompts, logs, or commits.
+- **HC2** — No writes outside the repository working tree.
+- **HC3** — Destructive commands (`rm -rf`, `git push --force`, schema drops,
+  package publishes) require explicit human approval.
+- **HC4** — Migrations and irreversible operations may be authored but never
+  executed by the agent.
+- **HC5** — Network egress is denied by default; allowlist in `AGENTS.md`.
+- **HC6** — Red-class data (secrets, PII, customer data) never enters prompts,
+  tool arguments, or logs.
+
+**Data classification:**
+
+| Class | Examples | In prompts? | In logs? |
+|---|---|---|---|
+| Green | OSS source, public docs | yes | yes |
+| Amber | Internal source, non-PII configs | yes (redact tokens) | redacted |
+| Red | Secrets, PII, customer data, keys | **no** | **no** |
+
+Use `gitleaks` pre-commit hook.  Run `local-agent-harness validate` before
+every PR to enforce these constraints.
 
 ## PR Checklist
 

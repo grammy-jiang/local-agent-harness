@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Manifest regression suite (TDAD-style).
 
-Treats AGENTS.md, GROUNDING.md, and overlays as compiled artifacts. Asserts
+Treats AGENTS.md and overlays as compiled artifacts. Asserts
 invariants that should hold under any harness change.
 
 Usage:
@@ -27,16 +27,8 @@ def _read(p: Path) -> str:
 def check(repo: Path) -> list[tuple[str, bool, str]]:
     results: list[tuple[str, bool, str]] = []
 
-    grounding = _read(repo / "GROUNDING.md")
     agents = _read(repo / "AGENTS.md")
 
-    results.append(
-        (
-            "GROUNDING.md exists",
-            bool(grounding),
-            "Add GROUNDING.md (use `local-agent-harness` skill).",
-        )
-    )
     results.append(
         (
             "AGENTS.md exists",
@@ -45,26 +37,26 @@ def check(repo: Path) -> list[tuple[str, bool, str]]:
         )
     )
 
-    # Hard constraints must mention secrets and scope
-    has_hc = bool(re.search(r"^- *HC[0-9]+", grounding, re.MULTILINE))
+    # Hard constraints must be inlined in AGENTS.md (HC1-HC6)
+    has_hc = bool(re.search(r"\bHC[0-9]+\b", agents))
     results.append(
         (
-            "GROUNDING.md declares hard constraints (HC*)",
+            "AGENTS.md declares hard constraints (HC*)",
             has_hc,
-            "Add HC1..HCN bullets to GROUNDING.md.",
+            "AGENTS.md must contain HC1..HCN bullets in the Security section.",
         )
     )
 
-    secrets_hc = "secret" in grounding.lower()
+    secrets_hc = "secret" in agents.lower()
     results.append(
         (
-            "GROUNDING.md addresses secrets",
+            "AGENTS.md addresses secrets",
             secrets_hc,
-            "Add an HC forbidding plaintext secrets.",
+            "Add an HC forbidding plaintext secrets to AGENTS.md.",
         )
     )
 
-    # AGENTS.md sections
+    # AGENTS.md required sections
     required_sections = [
         "Testing",
         "Scope Boundary",
@@ -100,12 +92,12 @@ def check(repo: Path) -> list[tuple[str, bool, str]]:
         )
     )
 
-    # Overlays must not relax HCs (heuristic: do not contain 'allow secrets' etc.)
+    # Overlays must not relax HCs
     bad = re.compile(r"allow.{0,12}secret|disable.{0,8}gitleaks|skip.{0,8}verify", re.IGNORECASE)
     overlay_paths = [
         repo / "CLAUDE.md",
-        repo / ".codex" / "config",
-        repo / ".github" / "copilot-cli.md",
+        repo / ".codex" / "INSTRUCTIONS.md",
+        repo / ".github" / "copilot-instructions.md",
     ]
     overlay_clean = True
     for op in overlay_paths:

@@ -21,8 +21,7 @@ def test_check_after_init_passes_most(empty_repo: Path) -> None:
     (empty_repo / ".agent").mkdir(exist_ok=True)
     results = manifest_regression.check(empty_repo)
     failed = [name for name, ok, _ in results if not ok]
-    # GROUNDING/AGENTS exist; gitignore set; only structural items should pass.
-    assert "GROUNDING.md exists" not in failed
+    # AGENTS.md should exist after init; only structural items may remain
     assert "AGENTS.md exists" not in failed
 
 
@@ -54,11 +53,11 @@ def test_main_pass_when_artifacts_minimal(
     # Render plan into expected location
     plan_src = empty_repo / ".agent" / "plan.md.tmpl"
     assert plan_src.exists()
-    # Add an HC bullet to GROUNDING.md (template already includes one)
-    g = empty_repo / "GROUNDING.md"
-    text = g.read_text()
-    if "- HC1" not in text:
-        g.write_text(text + "\n- HC1: no plaintext secrets\n")
+    # Ensure HC bullet is in AGENTS.md (template already includes one via Security section)
+    a = empty_repo / "AGENTS.md"
+    text = a.read_text()
+    if "HC1" not in text:
+        a.write_text(text + "\n- HC1: no plaintext secrets\n")
     rc = _run_main(manifest_regression, ["--repo", str(empty_repo)])
     out = capsys.readouterr().out
     # All checks should pass once the harness is initialized

@@ -43,8 +43,8 @@ def test_check_drift_exit_one(empty_repo: Path) -> None:
 
 def test_check_relaxed_exit_two(empty_repo: Path) -> None:
     runner.invoke(app, ["init", "--repo", str(empty_repo)])
-    g = empty_repo / "GROUNDING.md"
-    g.write_text(g.read_text() + "\nallow secrets in dev\n")
+    claude = empty_repo / "CLAUDE.md"
+    claude.write_text(claude.read_text() + "\nallow secrets in dev\n")
     r = runner.invoke(app, ["check", "--repo", str(empty_repo), "--stage", "S0"])
     assert r.exit_code == 2
 
@@ -73,17 +73,20 @@ def test_init_missing_repo(tmp_path: Path) -> None:
 
 
 def test_refresh_default_dryrun(empty_repo: Path) -> None:
-    (empty_repo / "GROUNDING.md").write_text("stale\n")
+    runner.invoke(app, ["init", "--repo", str(empty_repo), "--runtime", "claude-code"])
+    claude = empty_repo / "CLAUDE.md"
+    claude.write_text("stale\n")
     r = runner.invoke(app, ["refresh", "--repo", str(empty_repo)])
     assert r.exit_code == 0
-    assert (empty_repo / "GROUNDING.md").read_text() == "stale\n"
+    assert (empty_repo / "CLAUDE.md").read_text() == "stale\n"
 
 
 def test_refresh_apply_writes(empty_repo: Path) -> None:
-    (empty_repo / "GROUNDING.md").write_text("stale\n")
+    runner.invoke(app, ["init", "--repo", str(empty_repo), "--runtime", "claude-code"])
+    (empty_repo / "CLAUDE.md").write_text("stale\n")
     r = runner.invoke(app, ["refresh", "--repo", str(empty_repo), "--apply"])
     assert r.exit_code == 0
-    assert "Hard Constraints" in (empty_repo / "GROUNDING.md").read_text()
+    assert "Permission ladder" in (empty_repo / "CLAUDE.md").read_text()
 
 
 def test_refresh_missing_repo(tmp_path: Path) -> None:
@@ -136,8 +139,9 @@ def test_report_missing_repo(tmp_path: Path) -> None:
 
 def test_validate_clean_repo_passes(empty_repo: Path) -> None:
     runner.invoke(app, ["init", "--repo", str(empty_repo)])
-    g = empty_repo / "GROUNDING.md"
-    g.write_text(g.read_text() + "\n- HC1: no plaintext secrets\n")
+    a = empty_repo / "AGENTS.md"
+    if "HC1" not in a.read_text():
+        a.write_text(a.read_text() + "\n- HC1: no plaintext secrets\n")
     r = runner.invoke(app, ["validate", "--repo", str(empty_repo)])
     assert r.exit_code == 0
     assert "validate: OK" in r.stdout

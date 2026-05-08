@@ -19,7 +19,7 @@ def test_render_report_has_sentinel_and_machine_block(empty_repo: Path) -> None:
 def test_render_report_lists_missing_artifacts(empty_repo: Path) -> None:
     res = assess_repo.detect(empty_repo)
     text = readiness_report.render_report(res, empty_repo)
-    assert "GROUNDING.md" in text
+    assert "AGENTS.md" in text
 
 
 def test_render_report_no_missing(empty_repo: Path) -> None:

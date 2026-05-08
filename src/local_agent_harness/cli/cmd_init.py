@@ -64,6 +64,16 @@ def run(
         raise typer.Exit(code=2)
     if stage is None:
         stage = assess_repo.detect(repo)["stage"]
-    runtimes = list(runtime) if runtime else _prompt_runtimes()
+    if runtime:
+        runtimes = list(runtime)
+    else:
+        runtimes = _prompt_runtimes()
+        if not runtimes:
+            # Non-interactive (CI / test runner): detect existing overlays or use all
+            from local_agent_harness.core import diff_manifests
+
+            runtimes = diff_manifests._detect_runtimes(repo)
+            if not runtimes:
+                runtimes = sorted(_AVAILABLE_RUNTIMES)
     rc = scaffold_manifests.cmd_init(repo, stage, runtimes, dry_run)
     raise typer.Exit(code=rc)

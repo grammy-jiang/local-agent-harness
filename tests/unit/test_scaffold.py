@@ -14,17 +14,6 @@ def test_init_dry_run_does_not_write(empty_repo: Path, capsys: pytest.CaptureFix
     out = capsys.readouterr().out
     # AGENTS.md now handled by agents_builder (would create)
     assert "AGENTS.md" in out
-    assert not (empty_repo / "GROUNDING.md").exists()
-
-
-def test_init_skips_existing_grounding(
-    empty_repo: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    (empty_repo / "GROUNDING.md").write_text("preserved\n")
-    scaffold_manifests.cmd_init(empty_repo, "S0", [], dry=False)
-    assert (empty_repo / "GROUNDING.md").read_text() == "preserved\n"
-    out = capsys.readouterr().out
-    assert "skip (exists)" in out
 
 
 def test_init_creates_agents_md(empty_repo: Path) -> None:
@@ -113,9 +102,9 @@ def test_refresh_no_drift(empty_repo: Path, capsys: pytest.CaptureFixture[str]) 
 
 
 def test_refresh_blocked_on_relaxed(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    scaffold_manifests.cmd_init(empty_repo, "S0", [], dry=False)
-    g = empty_repo / "GROUNDING.md"
-    g.write_text(g.read_text() + "\nallow secrets here\n")
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code"], dry=False)
+    claude = empty_repo / "CLAUDE.md"
+    claude.write_text(claude.read_text() + "\nallow secrets here\n")
     capsys.readouterr()
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=False, dry=False)
     out = capsys.readouterr().out
@@ -124,7 +113,8 @@ def test_refresh_blocked_on_relaxed(empty_repo: Path, capsys: pytest.CaptureFixt
 
 
 def test_refresh_plan_only_message(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    (empty_repo / "GROUNDING.md").write_text("just\n")
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code"], dry=False)
+    (empty_repo / "CLAUDE.md").write_text("just\n")
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=False, dry=False)
     out = capsys.readouterr().out
     assert rc == 0
@@ -133,27 +123,30 @@ def test_refresh_plan_only_message(empty_repo: Path, capsys: pytest.CaptureFixtu
 
 
 def test_refresh_apply_writes_backup_and_template(empty_repo: Path) -> None:
-    g = empty_repo / "GROUNDING.md"
-    g.write_text("stale stub\n")
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code"], dry=False)
+    c = empty_repo / "CLAUDE.md"
+    c.write_text("stale stub\n")
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=True, dry=False)
     assert rc == 0
-    bak = empty_repo / "GROUNDING.md.md.bak"
-    assert bak.exists() or (empty_repo / "GROUNDING.md.bak").exists()
-    new_text = g.read_text()
-    assert "Hard Constraints" in new_text
+    bak = empty_repo / "CLAUDE.md.bak"
+    assert bak.exists()
+    new_text = c.read_text()
+    assert "Permission ladder" in new_text
 
 
 def test_refresh_apply_overwrites_existing_backup(empty_repo: Path) -> None:
-    g = empty_repo / "GROUNDING.md"
-    g.write_text("stub one\n")
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code"], dry=False)
+    c = empty_repo / "CLAUDE.md"
+    c.write_text("stub one\n")
     scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=True, dry=False)
-    g.write_text("stub two\n")
+    c.write_text("stub two\n")
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=True, dry=False)
     assert rc == 0
 
 
 def test_refresh_renders_missing_when_apply(empty_repo: Path) -> None:
-    (empty_repo / "GROUNDING.md").write_text("stale\n")
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code"], dry=False)
+    (empty_repo / "CLAUDE.md").write_text("stale\n")
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=True, dry=False)
     assert rc == 0
     assert (empty_repo / "AGENTS.md").exists()
@@ -162,12 +155,14 @@ def test_refresh_renders_missing_when_apply(empty_repo: Path) -> None:
 def test_refresh_dry_shows_plan_without_writing(
     empty_repo: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    (empty_repo / "GROUNDING.md").write_text("stale\n")
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code"], dry=False)
+    c = empty_repo / "CLAUDE.md"
+    c.write_text("stale\n")
     rc = scaffold_manifests.cmd_refresh(empty_repo, "S0", [], apply=False, dry=True)
     out = capsys.readouterr().out
     assert rc == 0
     assert "would refresh" in out
-    assert (empty_repo / "GROUNDING.md").read_text() == "stale\n"
+    assert c.read_text() == "stale\n"
 
 
 def test_check_returns_one_on_drift(empty_repo: Path, capsys: pytest.CaptureFixture[str]) -> None:
@@ -189,6 +184,18 @@ def test_main_init(empty_repo: Path) -> None:
     )
     assert rc == 0
     assert (empty_repo / "CLAUDE.md").exists()
+
+
+def test_main_init_no_runtime_creates_all_overlays(empty_repo: Path) -> None:
+    """When no --runtime flag is given, init creates all 3 overlays for a greenfield repo."""
+    rc = _run_main(
+        scaffold_manifests,
+        ["--repo", str(empty_repo), "--mode", "init"],
+    )
+    assert rc == 0
+    assert (empty_repo / "CLAUDE.md").exists()
+    assert (empty_repo / ".codex" / "INSTRUCTIONS.md").exists()
+    assert (empty_repo / ".github" / "copilot-instructions.md").exists()
 
 
 def test_main_check_drift(empty_repo: Path) -> None:
@@ -236,7 +243,7 @@ def test_refresh_skips_when_template_none(
     """`stale` entry without a 'template' key is filtered out."""
 
     fake_drift = {
-        "stale": [{"path": "GROUNDING.md"}],  # no 'template' key → tmpl is None
+        "stale": [{"path": "AGENTS.md"}],  # no 'template' key → tmpl is None
         "missing": [],
         "relaxed": [],
     }

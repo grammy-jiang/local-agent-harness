@@ -69,7 +69,6 @@ def _count_source_files(repo: Path) -> int:
 
 def detect(repo: Path) -> dict:
     has_agents = _exists(repo, "AGENTS.md")
-    has_grounding = _exists(repo, "GROUNDING.md")
     has_readme = any(_exists(repo, n) for n in ["README.md", "README.rst", "README"])
     has_ci = _exists(repo, ".github", "workflows")
     has_tests = _exists(repo, "tests") or _exists(repo, "test") or _exists(repo, "__tests__")
@@ -84,7 +83,7 @@ def detect(repo: Path) -> dict:
     has_governance = _exists(repo, ".github", "workflows", "governance.yml")
     has_overlays = any(
         _exists(repo, n)
-        for n in ["CLAUDE.md", ".codex/config", ".github/copilot-cli.md"]
+        for n in ["CLAUDE.md", ".codex/INSTRUCTIONS.md", ".github/copilot-instructions.md"]
     )
     has_logs_ignored = False
     gi = repo / ".gitignore"
@@ -109,9 +108,7 @@ def detect(repo: Path) -> dict:
     # Agent config
     a = 0
     if has_agents:
-        a += 1
-    if has_agents and has_grounding:
-        a = max(a, 2)
+        a = 2  # AGENTS.md now contains all constraints (HC1-HC6); counts as 2
     if a >= 2 and has_overlays:
         a = 3
     if a >= 3 and has_skills:
@@ -198,14 +195,12 @@ def detect(repo: Path) -> dict:
     detected_runtimes = []
     if (repo / "CLAUDE.md").exists():
         detected_runtimes.append("claude-code")
-    if (repo / ".codex" / "config").exists():
+    if (repo / ".codex" / "INSTRUCTIONS.md").exists():
         detected_runtimes.append("codex-cli")
-    if (repo / ".github" / "copilot-cli.md").exists():
+    if (repo / ".github" / "copilot-instructions.md").exists():
         detected_runtimes.append("copilot-cli")
 
     missing = []
-    if not has_grounding:
-        missing.append("GROUNDING.md")
     if not has_agents:
         missing.append("AGENTS.md")
     if not has_devc:
@@ -233,7 +228,6 @@ def detect(repo: Path) -> dict:
             "has_ci": has_ci,
             "has_tags": has_tags,
             "has_agents": has_agents,
-            "has_grounding": has_grounding,
             "has_devcontainer": has_devc,
             "has_pre_commit": has_precommit,
             "has_governance": has_governance,

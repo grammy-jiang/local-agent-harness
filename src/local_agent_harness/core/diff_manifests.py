@@ -39,12 +39,6 @@ from . import assess_repo  # type: ignore
 #  minimum stage at which the artifact is required — S0 means always)
 TARGETS = [
     (
-        "GROUNDING.md.tmpl",
-        "GROUNDING.md",
-        ["Hard Constraints", "Convention Parameters", "Data Classification", "Enforcement"],
-        "S0",
-    ),
-    (
         "AGENTS.md.tmpl",
         "AGENTS.md",
         [
@@ -52,6 +46,7 @@ TARGETS = [
             "Scope Boundary",
             "Security",
             "PR Checklist",
+            "HC1",
         ],
         "S0",
     ),
@@ -72,7 +67,7 @@ TARGETS = [
     (
         "ci/governance.yml.tmpl",
         ".github/workflows/governance.yml",
-        ["GROUNDING.md", "no-regression"],
+        ["AGENTS.md", "no-regression"],
         "S2",
     ),
     (
@@ -110,14 +105,12 @@ RELAX_PATTERNS = [
 # Stage gates: artifacts each stage requires
 STAGE_REQUIREMENTS = {
     "S0": [
-        "GROUNDING.md",
         "AGENTS.md",
         ".agent/plan.md.tmpl",
         ".devcontainer/devcontainer.json",
         ".pre-commit-config.yaml",
     ],
     "S1": [
-        "GROUNDING.md",
         "AGENTS.md",
         ".agent/plan.md.tmpl",
         ".devcontainer/devcontainer.json",
@@ -126,7 +119,6 @@ STAGE_REQUIREMENTS = {
         ".skills/",
     ],
     "S2": [
-        "GROUNDING.md",
         "AGENTS.md",
         ".agent/plan.md.tmpl",
         ".devcontainer/devcontainer.json",
@@ -137,7 +129,6 @@ STAGE_REQUIREMENTS = {
         ".agent/eval/readiness.md",
     ],
     "S3": [
-        "GROUNDING.md",
         "AGENTS.md",
         ".agent/plan.md.tmpl",
         ".devcontainer/devcontainer.json",

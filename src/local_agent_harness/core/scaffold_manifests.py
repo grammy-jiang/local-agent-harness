@@ -40,7 +40,6 @@ from . import runtime_overlay as _runtime_overlay
 
 CORE_FILES = [
     # AGENTS.md is handled separately via agents_builder (always updated)
-    ("GROUNDING.md.tmpl", "GROUNDING.md"),
 ]
 
 AGENT_DIR_FILES = [
@@ -197,7 +196,14 @@ def main() -> int:
     print(f"# local-agent-harness mode={args.mode} stage={stage} repo={repo}")
 
     if args.mode == "init":
-        return cmd_init(repo, stage, args.runtime, args.dry_run)
+        runtimes = args.runtime
+        if not runtimes:
+            # Auto-detect from existing overlay files; fall back to all three
+            # for greenfield repos so that every agent gets its overlay.
+            runtimes = diff_manifests._detect_runtimes(repo)
+            if not runtimes:
+                runtimes = sorted(SUPPORTED_RUNTIMES)
+        return cmd_init(repo, stage, runtimes, args.dry_run)
     if args.mode == "refresh":
         return cmd_refresh(repo, stage, args.runtime, args.apply, args.dry_run)
     if args.mode == "check":

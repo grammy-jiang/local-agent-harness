@@ -8,7 +8,7 @@ Follows the agents.md open standard (https://agents.md/):
 Strategy:
   1. Detect project info: build/test/lint commands, code style, tech stack.
   2. Generate AGENTS.md with practical sections (setup, testing, conventions)
-     plus governance cross-references to GROUNDING.md.
+     plus inlined hard constraints (HC1-HC6) in the Security section.
   3. On subsequent runs, refresh only the auto-generated sections (those
      between sentinel comments) while preserving human edits.
 """
@@ -100,12 +100,9 @@ def detect_project_info(repo: Path) -> dict[str, Any]:
         pyver_match = re.search(r'target-version\s*=\s*"(py\d+)"', text)
         if pyver_match:
             info["style_hints"].append(f"Target Python: {pyver_match.group(1)}")
-        # Conventional Commits from GROUNDING.md
-        grounding = _read(repo / "GROUNDING.md")
-        if "Conventional Commits" in grounding:
+        # Conventional Commits from pyproject.toml or repo conventions
+        if "Conventional Commits" in text:
             info["commit_style"] = "Conventional Commits"
-        if "agent/" in grounding:
-            info["branch_pattern"] = "agent/<task-slug>"
 
     # --- Node / package.json ---
     pkg = repo / "package.json"
@@ -227,9 +224,15 @@ def build_agents_md(repo: Path, info: dict[str, Any]) -> str:
         "| Execute | see `.agent/policies/commands.allowlist` |\n"
         "| Network | denied by default |\n"
         "\n"
-        "## Security\n\n"
-        "See `GROUNDING.md` for hard constraints (HC1\u2013HC6).  No plaintext secrets\n"
-        "in source, logs, or prompts.  Use `gitleaks` pre-commit hook.\n"
+        "## Security and Hard Constraints\n\n"
+        "All hard constraints may never be relaxed.\n\n"
+        "- **HC1** \u2014 No plaintext secrets in repository, prompts, logs, or commits.\n"
+        "- **HC2** \u2014 No writes outside the repository working tree.\n"
+        "- **HC3** \u2014 Destructive commands require explicit human approval.\n"
+        "- **HC4** \u2014 Irreversible operations may be authored but never executed by the agent.\n"
+        "- **HC5** \u2014 Network egress denied by default; allowlist documented in `AGENTS.md`.\n"
+        "- **HC6** \u2014 Red-class data (secrets, PII) never enters prompts, tool args, or logs.\n\n"
+        "Use `gitleaks` pre-commit hook.  Run `local-agent-harness validate` before every PR.\n"
         "\n"
         "## PR Checklist\n\n"
         "1. All tests pass.\n"
@@ -241,7 +244,7 @@ def build_agents_md(repo: Path, info: dict[str, Any]) -> str:
     return (
         "# AGENTS.md\n\n"
         "> Agent instructions for this repository.\n"
-        "> See also: `GROUNDING.md` (hard constraints), `.agent/plan.md` (session plan).\n\n"
+        "> See also: `.agent/plan.md` (session plan).\n\n"
         + auto_block
         + "\n\n"
         + static_block
