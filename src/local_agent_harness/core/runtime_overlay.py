@@ -169,10 +169,7 @@ _COPILOT_INSTRUCTIONS = """\
 - If a change requires a dependency update, call it out explicitly in the PR
   description.
 
-## Stop conditions
-
-- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
-- Out-of-scope write: abort + revert + report.
+<!-- Stop conditions are defined in AGENTS.md (shared spine). -->
 """
 
 _COPILOT_GENERAL_INSTRUCTIONS = """\
@@ -188,8 +185,8 @@ Follow the conventions in `AGENTS.md` (repository root) for all files.
 Specific rules:
 - Keep functions small and single-purpose.
 - Add or update tests whenever you change behaviour.
-- Do not commit secrets, credentials, or environment-variable values.
 - Prefer explicit error handling over silent failures.
+<!-- "Do not commit secrets" is covered by HC1 in AGENTS.md. -->
 """
 
 
@@ -227,10 +224,7 @@ _CODEX_INSTRUCTIONS = """\
 - Sandbox: devcontainer; network egress denied by default.
 - Session transcripts: `.agent/logs/`.
 
-## Stop conditions
-
-- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
-- Out-of-scope write: abort + revert + report.
+<!-- Stop conditions are defined in AGENTS.md (shared spine). -->
 """
 
 

@@ -47,6 +47,7 @@ TARGETS = [
             "Security",
             "PR Checklist",
             "HC1",
+            "Stop Conditions",
         ],
         "S0",
     ),
@@ -86,11 +87,11 @@ OVERLAYS = {
         "CLAUDE.md",
         ["Permission ladder", "claude-code-only"],
     ),
-    "codex-cli": ("runtime-overlays/codex.config.tmpl", ".codex/INSTRUCTIONS.md", ["Codex-specific settings", "Stop conditions"]),
+    "codex-cli": ("runtime-overlays/codex.config.tmpl", ".codex/INSTRUCTIONS.md", ["Codex-specific settings"]),
     "copilot-cli": (
         "runtime-overlays/copilot-cli.tmpl",
         ".github/copilot-instructions.md",
-        ["Copilot-specific guidance", "Stop conditions"],
+        ["Copilot-specific guidance"],
     ),
 }
 
