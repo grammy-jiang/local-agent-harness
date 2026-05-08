@@ -2,21 +2,12 @@
 <!-- Repository-wide custom instructions for GitHub Copilot                   -->
 <!-- Docs: https://docs.github.com/en/copilot/customizing-copilot             -->
 <!--                                                                           -->
-<!-- Copilot reads AGENTS.md natively.  This file adds only Copilot-specific  -->
-<!-- supplements that cannot live in AGENTS.md.                                -->
+<!-- Shared conventions, stop conditions, scope boundary, and PR checklist    -->
+<!-- all live in AGENTS.md — Copilot reads that file natively.                -->
+<!-- Add only Copilot-specific supplements below.                              -->
 
 ## Copilot-specific guidance
 
-- Always run the test suite and linter after every change.
-- Never push directly to `main`; open a pull request.
-- Keep pull requests small and focused; split unrelated changes into separate
-  PRs.
-- Include tests for every new function and every bug fix.
-- When generating new code, match the style and patterns already in use.
-- If a change requires a dependency update, call it out explicitly in the PR
-  description.
-
-## Stop conditions
-
-- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
-- Out-of-scope write: abort + revert + report.
+<!-- All shared rules (conventions, testing, style, PR checklist, stop
+     conditions) are defined in AGENTS.md and apply to Copilot natively.
+     Add Copilot-only supplements here if needed in future. -->

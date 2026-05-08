@@ -79,8 +79,7 @@ Always retain: `AGENTS.md`, current `plan.md`, last 5 tool calls, open diff.
 
 ### Stop conditions
 - If a tool call fails 3× consecutively → stop and ask the user.
-- If `accept-edits` mode writes outside the declared scope → abort and
-  revert, then report what happened.
+<!-- Out-of-scope write behaviour is covered by AGENTS.md § Stop Conditions. -->
 <!-- claude-code-only: end -->
 """
 
@@ -155,21 +154,15 @@ _COPILOT_INSTRUCTIONS = """\
 <!-- Repository-wide custom instructions for GitHub Copilot                   -->
 <!-- Docs: https://docs.github.com/en/copilot/customizing-copilot             -->
 <!--                                                                           -->
-<!-- Copilot reads AGENTS.md natively.  This file adds only Copilot-specific  -->
-<!-- supplements that cannot live in AGENTS.md.                                -->
+<!-- Shared conventions, stop conditions, scope boundary, and PR checklist    -->
+<!-- all live in AGENTS.md — Copilot reads that file natively.                -->
+<!-- Add only Copilot-specific supplements below.                              -->
 
 ## Copilot-specific guidance
 
-- Always run the test suite and linter after every change.
-- Never push directly to `main`; open a pull request.
-- Keep pull requests small and focused; split unrelated changes into separate
-  PRs.
-- Include tests for every new function and every bug fix.
-- When generating new code, match the style and patterns already in use.
-- If a change requires a dependency update, call it out explicitly in the PR
-  description.
-
-<!-- Stop conditions are defined in AGENTS.md (shared spine). -->
+<!-- All shared rules (conventions, testing, style, PR checklist, stop
+     conditions) are defined in AGENTS.md and apply to Copilot natively.
+     Add Copilot-only supplements here if needed in future. -->
 """
 
 _COPILOT_GENERAL_INSTRUCTIONS = """\
@@ -180,13 +173,9 @@ applyTo: "**"
 <!-- .github/instructions/general.instructions.md                         -->
 <!-- Path-specific instruction applied to every file in this repository.   -->
 
-Follow the conventions in `AGENTS.md` (repository root) for all files.
-
-Specific rules:
-- Keep functions small and single-purpose.
-- Add or update tests whenever you change behaviour.
-- Prefer explicit error handling over silent failures.
-<!-- "Do not commit secrets" is covered by HC1 in AGENTS.md. -->
+Follow the conventions and hard constraints in `AGENTS.md` (repository root)
+for all files.
+<!-- Specific rules (style, testing, error handling, secrets) are defined in AGENTS.md. -->
 """
 
 
@@ -221,7 +210,7 @@ _CODEX_INSTRUCTIONS = """\
 
 - Default approval mode: `suggest` (confirm each edit before writing).
 - Max turns per session: 40.
-- Sandbox: devcontainer; network egress denied by default.
+- Sandbox: devcontainer (see `.devcontainer/devcontainer.json`).
 - Session transcripts: `.agent/logs/`.
 
 <!-- Stop conditions are defined in AGENTS.md (shared spine). -->

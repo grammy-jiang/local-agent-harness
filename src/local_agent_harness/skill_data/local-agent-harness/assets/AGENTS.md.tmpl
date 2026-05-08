@@ -21,6 +21,11 @@ _No lint/format commands detected — add them here._
 - Branch naming: `agent/<task-slug>`
 - Commit style: Conventional Commits
 - `from __future__ import annotations` at the top of every Python file.
+- Keep functions small and single-purpose.
+- Match the existing code style and patterns already in use.
+- Prefer explicit error handling over silent failures.
+- Run the test suite and linter after every change.
+- Never push directly to `main`; always open a pull request.
 
 ## Scope Boundary
 
@@ -58,10 +63,18 @@ All hard constraints are enforced at every stage and may never be relaxed.
 Use `gitleaks` pre-commit hook.  Run `local-agent-harness validate` before
 every PR to enforce these constraints.
 
+## Stop Conditions
+
+Applies to all runtimes:
+
+- Doom-loop: if the same tool is called 5× with similar args, stop and ask.
+- Out-of-scope write: abort + revert + report.
+
 ## PR Checklist
 
-1. All tests pass.
+1. All tests pass; add tests for every new function and every bug fix.
 2. Linter and formatter clean.
 3. No new secrets or SAST findings.
-4. PR description: change summary, risks, verification evidence.
-5. Append a `Decisions log` entry in `.agent/plan.md` for non-trivial choices.
+4. PR description: change summary, risks, verification evidence; call out any dependency changes explicitly.
+5. Keep PRs small and focused; split unrelated changes into separate PRs.
+6. Append a `Decisions log` entry in `.agent/plan.md` for non-trivial choices.
