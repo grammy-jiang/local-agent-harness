@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] — 2026-05-08
+
+### Fixed
+- Copilot overlay (`_COPILOT_INSTRUCTIONS` / `copilot-cli.tmpl`): dropped
+  the redundant "Primary instructions: AGENTS.md" block; Copilot reads
+  `AGENTS.md` natively, so only Copilot-specific guidance is kept.
+- Codex overlay (`_CODEX_INSTRUCTIONS` / `codex.config.tmpl`): replaced
+  the placeholder "edit AGENTS.md instead" stub with real Codex runtime
+  settings (`approval_mode`, `max_turns`, sandbox, transcripts path).
+- `diff_manifests.py`: updated drift anchors to match new overlay content.
+- `AGENTS.md` (repo's own): rewritten with `## Testing`, `## Security`
+  (HC1–HC6), and `## PR Checklist` sections; removed stale placeholders.
+- Removed unused `_assets_dir` import from `runtime_overlay.py`.
+- ADR-001 updated with follow-up cleanup notes.
+
 ## [0.3.1] — 2026-05-08
 
 ### Fixed
