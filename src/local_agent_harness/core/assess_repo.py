@@ -71,11 +71,7 @@ def detect(repo: Path) -> dict:
     has_agents = _exists(repo, "AGENTS.md")
     has_grounding = _exists(repo, "GROUNDING.md")
     has_readme = any(_exists(repo, n) for n in ["README.md", "README.rst", "README"])
-    has_ci = (
-        _exists(repo, ".github", "workflows")
-        or _exists(repo, ".gitlab-ci.yml")
-        or _exists(repo, ".circleci", "config.yml")
-    )
+    has_ci = _exists(repo, ".github", "workflows")
     has_tests = _exists(repo, "tests") or _exists(repo, "test") or _exists(repo, "__tests__")
     has_src = _exists(repo, "src") or _exists(repo, "lib") or _exists(repo, "app")
     has_devc = _exists(repo, ".devcontainer", "devcontainer.json") or _exists(
@@ -88,7 +84,7 @@ def detect(repo: Path) -> dict:
     has_governance = _exists(repo, ".github", "workflows", "governance.yml")
     has_overlays = any(
         _exists(repo, n)
-        for n in ["CLAUDE.md", ".codex/config", ".github/copilot-cli.md", ".cursor/rules"]
+        for n in ["CLAUDE.md", ".codex/config", ".github/copilot-cli.md"]
     )
     has_logs_ignored = False
     gi = repo / ".gitignore"
@@ -206,8 +202,6 @@ def detect(repo: Path) -> dict:
         detected_runtimes.append("codex-cli")
     if (repo / ".github" / "copilot-cli.md").exists():
         detected_runtimes.append("copilot-cli")
-    if (repo / ".cursor" / "rules").exists():
-        detected_runtimes.append("cursor")
 
     missing = []
     if not has_grounding:

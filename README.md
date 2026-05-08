@@ -1,14 +1,14 @@
 # local-agent-harness
 
 Maturity-aware harness manager for local AI coding agents (Claude Code,
-Codex CLI, GitHub Copilot CLI, Cursor).
+Codex CLI, GitHub Copilot CLI).
 
 `local-agent-harness` makes a repository ready for AI-agent-assisted
 development from two directions:
 
 1. **Make the agent work better.** Generate `AGENTS.md` / `GROUNDING.md`,
    per-runtime overlays (`CLAUDE.md`, `.codex/config`,
-   `.github/copilot-cli.md`, `.cursor/rules`), tool DAGs, permission
+   `.github/copilot-cli.md`), tool DAGs, permission
    ladders, governed memory, and cost/context budgets.
 2. **Make the repository ready.** Render sandbox/devcontainer,
    `.pre-commit-config.yaml`, verify CI, governance CI, secrets/SAST/dep
@@ -33,7 +33,7 @@ into project-local locations like `.github/skills/`.
 ```bash
 local-agent-harness assess                 # detect maturity stage + AI-readiness score
 local-agent-harness check                  # audit manifests for drift (read-only)
-local-agent-harness init  --runtime claude-code --runtime copilot-cli
+local-agent-harness init  --runtime claude-code --runtime copilot-cli --runtime codex-cli
 local-agent-harness refresh --apply        # rewrite stale manifests (backups written)
 local-agent-harness report --out .agent/readiness.md
 local-agent-harness validate               # regression + redaction smoke checks

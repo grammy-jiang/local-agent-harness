@@ -4,8 +4,8 @@ build-backend = "uv_build"
 
 [project]
 name = "local-agent-harness"
-version = "0.1.0"
-description = "Maturity-aware harness manager for local AI coding agents (Claude Code, Codex CLI, Copilot CLI, Cursor). Audit, init, and refresh AGENTS.md / GROUNDING.md / CI / sandbox at the right S0–S3 stage; ships an installable skill."
+version = "0.2.0"
+description = "Maturity-aware harness manager for local AI coding agents (Claude Code, Codex CLI, Copilot CLI). Audit, init, and refresh AGENTS.md / GROUNDING.md / CI on GitHub Actions / sandbox at the right S0–S3 stage; ships an installable skill."
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -17,7 +17,7 @@ keywords = [
   "claude-code",
   "codex-cli",
   "copilot-cli",
-  "cursor",
+  "github-actions",
   "agents-md",
   "harness",
   "skill",

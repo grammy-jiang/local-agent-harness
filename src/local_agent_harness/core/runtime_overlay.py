@@ -6,16 +6,15 @@ DRY principle
 ``AGENTS.md`` (repository root) is the **single source of truth** for build
 commands, test commands, conventions, and scope boundaries.  Every
 overlay file either imports ``AGENTS.md`` directly (Claude Code), explicitly
-references it (GitHub Copilot, Cursor), or defers to it completely (Codex).
+references it (GitHub Copilot), or defers to it completely (Codex).
 
 Supported runtimes
 ------------------
 * ``claude-code``   → ``CLAUDE.md`` (with ``@AGENTS.md`` import) +
                       ``.claude/settings.json`` (project permissions)
-* ``copilot``       → ``.github/copilot-instructions.md`` (repo-wide) +
+* ``copilot-cli``   → ``.github/copilot-instructions.md`` (repo-wide) +
                       ``.github/instructions/general.instructions.md``
 * ``codex-cli``     → ``.codex/INSTRUCTIONS.md`` (pointer to AGENTS.md)
-* ``cursor``        → ``.cursor/rules`` (copied from bundled template)
 
 None of these functions overwrite a file that already exists.
 """
@@ -23,7 +22,6 @@ None of these functions overwrite a file that already exists.
 from __future__ import annotations
 
 import json
-import shutil
 from pathlib import Path
 from typing import Any
 
@@ -262,24 +260,6 @@ def render_codex(repo: Path, dry: bool) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Cursor
-# ---------------------------------------------------------------------------
-
-
-def render_cursor(repo: Path, dry: bool) -> list[str]:
-    """Copy the bundled cursor-rules template to ``.cursor/rules`` if missing."""
-    src = _assets_dir() / "runtime-overlays" / "cursor-rules.tmpl"
-    dst = repo / ".cursor" / "rules"
-    if dst.exists():
-        return [f"skip (exists): {dst}"]
-    if dry:
-        return [f"would render: {dst}"]
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(src, dst)
-    return [f"rendered: {dst}"]
-
-
-# ---------------------------------------------------------------------------
 # Dispatcher
 # ---------------------------------------------------------------------------
 
@@ -296,8 +276,6 @@ def render_runtime(runtime: str, repo: Path, dry: bool) -> list[str]:
         return render_copilot(repo, dry)
     if runtime == "codex-cli":
         return render_codex(repo, dry)
-    if runtime == "cursor":
-        return render_cursor(repo, dry)
     raise ValueError(f"Unknown runtime: {runtime!r}")
 
 
@@ -305,6 +283,6 @@ if __name__ == "__main__":  # pragma: no cover
     import sys
 
     _repo = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
-    for _rt in ["claude-code", "copilot-cli", "codex-cli", "cursor"]:
+    for _rt in ["claude-code", "copilot-cli", "codex-cli"]:
         for _msg in render_runtime(_rt, _repo, dry=True):
             print(_msg)

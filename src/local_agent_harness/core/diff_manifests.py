@@ -97,7 +97,6 @@ OVERLAYS = {
         ".github/copilot-instructions.md",
         ["AGENTS.md", "Copilot"],
     ),
-    "cursor": ("runtime-overlays/cursor-rules.tmpl", ".cursor/rules", ["Always", "Never"]),
 }
 
 # patterns whose presence in any manifest signals a "relaxed" hard constraint

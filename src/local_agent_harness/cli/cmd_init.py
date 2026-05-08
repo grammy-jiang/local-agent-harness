@@ -8,12 +8,11 @@ import typer
 
 from local_agent_harness.core import assess_repo, scaffold_manifests
 
-_AVAILABLE_RUNTIMES = ["copilot-cli", "claude-code", "codex-cli", "cursor"]
+_AVAILABLE_RUNTIMES = ["copilot-cli", "claude-code", "codex-cli"]
 _RUNTIME_LABELS = {
     "copilot-cli": "GitHub Copilot  (.github/copilot-instructions.md + .github/instructions/)",
     "claude-code": "Claude Code     (CLAUDE.md @AGENTS.md + .claude/settings.json)",
     "codex-cli": "OpenAI Codex    (AGENTS.md primary + .codex/INSTRUCTIONS.md)",
-    "cursor": "Cursor          (.cursor/rules)",
 }
 
 
@@ -53,7 +52,7 @@ def run(
         [],
         "--runtime",
         help=(
-            "Runtime overlay(s) to render: copilot-cli|claude-code|codex-cli|cursor. "
+            "Runtime overlay(s) to render: copilot-cli|claude-code|codex-cli. "
             "Omit to be prompted interactively (when stdin is a TTY)."
         ),
     ),

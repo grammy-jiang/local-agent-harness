@@ -59,9 +59,9 @@ def test_init_S1_dry_does_not_create_skills(
 
 
 def test_init_writes_runtime_overlays(empty_repo: Path) -> None:
-    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code", "cursor"], dry=False)
+    scaffold_manifests.cmd_init(empty_repo, "S0", ["claude-code", "codex-cli"], dry=False)
     assert (empty_repo / "CLAUDE.md").exists()
-    assert (empty_repo / ".cursor" / "rules").exists()
+    assert (empty_repo / ".codex" / "INSTRUCTIONS.md").exists()
 
 
 def test_gitignore_created_with_harness_block(empty_repo: Path) -> None:

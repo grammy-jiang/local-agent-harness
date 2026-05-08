@@ -106,7 +106,6 @@ def check(repo: Path) -> list[tuple[str, bool, str]]:
         repo / "CLAUDE.md",
         repo / ".codex" / "config",
         repo / ".github" / "copilot-cli.md",
-        repo / ".cursor" / "rules",
     ]
     overlay_clean = True
     for op in overlay_paths:

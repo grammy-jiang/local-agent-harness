@@ -28,7 +28,7 @@ Empty or scaffold-only repo. Goal: lay deterministic groundwork before any
 code lands.
 
 ### Direction A — make the agent better
-- Pick the runtime (Claude Code / Codex CLI / Copilot CLI / Cursor).
+- Pick the runtime (Claude Code / Codex CLI / Copilot CLI).
 - Render `GROUNDING.md` and `AGENTS.md` skeletons (mark stage = S0).
 - Render `.agent/plan.md` template; require it before any edit.
 - Default permission mode = `plan` for all sessions.
@@ -149,7 +149,7 @@ Backups are written to `<file>.bak` so the user can re-merge customizations.
 
 When to schedule a refresh:
 
-- after upgrading any runtime (Claude Code, Codex CLI, Copilot CLI, Cursor);
+- after upgrading any runtime (Claude Code, Codex CLI, Copilot CLI);
 - after bumping `metadata.version` on this skill;
 - after a major dependency or CI provider change;
 - before each release.

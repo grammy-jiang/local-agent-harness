@@ -1,6 +1,6 @@
 ---
 name: local-agent-harness
-description: Manage the local AI-coding-agent harness for any repository — empty, partially configured, or fully mature. Detects the repo's maturity stage (S0 greenfield → S3 production), audits existing manifests for drift (missing sections, relaxed constraints, stale overlays), and applies a stage-appropriate harness covering both the agent (AGENTS.md, GROUNDING.md, plan.md, tool DAG, permission ladder, governed memory, cost/context budgets, runtime overlays for Claude Code / Codex CLI / Copilot CLI / Cursor) and the repo (sandbox/devcontainer, pre-commit, verify CI, governance CI, secrets/SAST/dep scans, AI-readiness score). Use when the user says "make this repo agent-ready", "bootstrap AGENTS.md or GROUNDING.md", "audit our agent setup", "score AI-readiness", "refresh the harness", "check whether AGENTS.md is up to date", or "evolve the harness as the repo grows". Three modes — check (read-only audit), init (render missing artifacts; never overwrites), refresh (back up + rewrite stale artifacts).
+description: Manage the local AI-coding-agent harness for any repository — empty, partially configured, or fully mature. Detects the repo's maturity stage (S0 greenfield → S3 production), audits existing manifests for drift (missing sections, relaxed constraints, stale overlays), and applies a stage-appropriate harness covering both the agent (AGENTS.md, GROUNDING.md, plan.md, tool DAG, permission ladder, governed memory, cost/context budgets, runtime overlays for Claude Code / Codex CLI / Copilot CLI) and the repo (sandbox/devcontainer, pre-commit, verify CI on GitHub Actions, governance CI, secrets/SAST/dep scans, AI-readiness score). Use when the user says "make this repo agent-ready", "bootstrap AGENTS.md or GROUNDING.md", "audit our agent setup", "score AI-readiness", "refresh the harness", "check whether AGENTS.md is up to date", or "evolve the harness as the repo grows". Three modes — check (read-only audit), init (render missing artifacts; never overwrites), refresh (back up + rewrite stale artifacts).
 ---
 
 # local-agent-harness
@@ -29,7 +29,7 @@ layers may specialize but never relax lower-layer constraints.
 
 ## When to use
 
-- "Make this repo ready for Claude Code / Codex CLI / Copilot CLI / Cursor."
+- "Make this repo ready for Claude Code / Codex CLI / Copilot CLI."
 - "Audit the AGENTS.md / GROUNDING.md / CLAUDE.md we already have."
 - "Check whether the harness is up to date."
 - "Refresh the agent configuration after a tooling upgrade."
@@ -46,7 +46,7 @@ layers may specialize but never relax lower-layer constraints.
 
 1. The **repository path** (default: cwd).
 2. The **target runtime(s)** — any of `claude-code`, `codex-cli`,
-   `copilot-cli`, `cursor` (auto-detected from existing files; otherwise ask).
+   `copilot-cli` (auto-detected from existing files; otherwise ask).
 3. The **operating mode** — `check`, `init`, or `refresh` (default: start
    with `check`).
 4. The **direction** to optimize — A, B, or both (default: both).
@@ -151,7 +151,7 @@ If the stage advanced (e.g., the user added tests + CI between sessions),
 propose the next-stage upgrade as a separate PR. Otherwise, recommend
 re-running `--mode check` whenever:
 
-- a runtime is upgraded (Claude Code, Codex CLI, Copilot CLI, Cursor);
+- a runtime is upgraded (Claude Code, Codex CLI, Copilot CLI);
 - a new template version of this skill is released (compare
   `metadata.version`);
 - a major dependency or CI provider changes;
@@ -246,6 +246,6 @@ Cause: file path or naming differs across versions. See
 - `references/tool-dag-patterns.md` — read/search/edit/execute split.
 - `references/memory-governance.md` — three tiers, schema-grounded.
 - `references/verify-gate-catalog.md` — the gate sequence.
-- `references/runtime-overlays.md` — Claude Code / Codex / Copilot / Cursor paths.
+- `references/runtime-overlays.md` — Claude Code / Codex / Copilot paths.
 - `references/manifest-anti-patterns.md` — relaxed-HC patterns and fixes.
 - `references/source-mapping.md` — links to the research vault.

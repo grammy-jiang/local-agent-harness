@@ -18,10 +18,6 @@ overlay that **specializes** behavior; overlays may not relax `GROUNDING.md`.
 - Sandbox required for untrusted repos.
 - Doom-loop detection: same tool 5× ⇒ stop.
 
-## Cursor — `.cursor/rules`
-- "Always / Never" rules mirror `GROUNDING.md` HCs.
-- Prefer `Edit` over rewrites; `Search` before `Read`.
-
 ## Cross-runtime contract
 1. All overlays must reference `AGENTS.md` and `GROUNDING.md` by path.
 2. All overlays must respect the path allowlist.

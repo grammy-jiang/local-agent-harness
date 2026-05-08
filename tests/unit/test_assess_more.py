@@ -81,14 +81,11 @@ def test_detect_runtimes_listed(empty_repo: Path) -> None:
     (empty_repo / ".codex" / "config").write_text("x")
     (empty_repo / ".github").mkdir()
     (empty_repo / ".github" / "copilot-cli.md").write_text("x")
-    (empty_repo / ".cursor").mkdir()
-    (empty_repo / ".cursor" / "rules").write_text("x")
     res = assess_repo.detect(empty_repo)
     assert set(res["detected_runtimes"]) == {
         "claude-code",
         "codex-cli",
         "copilot-cli",
-        "cursor",
     }
 
 

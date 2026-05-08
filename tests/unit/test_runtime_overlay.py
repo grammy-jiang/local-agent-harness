@@ -226,33 +226,6 @@ def test_render_codex_skips_existing(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# render_cursor
-# ---------------------------------------------------------------------------
-
-
-def test_render_cursor_creates_file(tmp_path: Path) -> None:
-    msgs = runtime_overlay.render_cursor(tmp_path, dry=False)
-    assert len(msgs) == 1
-    assert (tmp_path / ".cursor" / "rules").exists()
-    assert "rendered:" in msgs[0]
-
-
-def test_render_cursor_dry_run(tmp_path: Path) -> None:
-    msgs = runtime_overlay.render_cursor(tmp_path, dry=True)
-    assert not (tmp_path / ".cursor").exists()
-    assert "would render:" in msgs[0]
-
-
-def test_render_cursor_skips_existing(tmp_path: Path) -> None:
-    (tmp_path / ".cursor").mkdir()
-    rules = tmp_path / ".cursor" / "rules"
-    rules.write_text("custom rules")
-    msgs = runtime_overlay.render_cursor(tmp_path, dry=False)
-    assert "skip" in msgs[0]
-    assert rules.read_text() == "custom rules"
-
-
-# ---------------------------------------------------------------------------
 # render_runtime dispatcher
 # ---------------------------------------------------------------------------
 
@@ -272,11 +245,6 @@ def test_render_runtime_copilot_cli(tmp_path: Path) -> None:
 
 def test_render_runtime_codex_cli(tmp_path: Path) -> None:
     msgs = runtime_overlay.render_runtime("codex-cli", tmp_path, dry=True)
-    assert len(msgs) == 1
-
-
-def test_render_runtime_cursor(tmp_path: Path) -> None:
-    msgs = runtime_overlay.render_runtime("cursor", tmp_path, dry=True)
     assert len(msgs) == 1
 
 
