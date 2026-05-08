@@ -18,16 +18,11 @@ _Languages, frameworks, runtimes — e.g., Python 3.12, FastAPI, Node.js 20_
 
 ## Build & Validation Commands
 
+<!-- Project setup, build, test, and lint commands are in AGENTS.md
+     (§Setup, §Testing, §Lint and Format) — read natively by all agent
+     runtimes (Claude Code, Codex CLI, Copilot Cloud Agent). -->
+
 ```bash
-# Setup
-# <install command>
-
-# Test
-# <test command>
-
-# Lint / Format
-# <lint command>
-
 # Agent harness
 local-agent-harness check --repo .
 local-agent-harness validate --repo .
@@ -47,3 +42,5 @@ pre-commit run --all-files
 ## Notes
 
 - `.agent/eval/` is gitignored; readiness reports are local only.
+- `.gitignore` is managed by `local-agent-harness`; do not hand-edit
+  the section below the `# local-agent-harness` marker.

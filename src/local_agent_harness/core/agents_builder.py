@@ -208,16 +208,23 @@ def build_agents_md(repo: Path, info: dict[str, Any]) -> str:
     auto_block = _build_auto_block(info)
     branch = info.get("branch_pattern", "agent/<task-slug>")
     commit = info.get("commit_style", "Conventional Commits")
+    python_convention = (
+        "- `from __future__ import annotations` at the top of every Python file.\n"
+        if "Python" in info.get("stack", [])
+        else ""
+    )
     static_block = (
         "## Conventions\n\n"
         f"- Branch naming: `{branch}`\n"
         f"- Commit style: {commit}\n"
-        "- `from __future__ import annotations` at the top of every Python file.\n"
-        "- Keep functions small and single-purpose.\n"
+        + python_convention
+        + "- Keep functions small and single-purpose.\n"
         "- Match the existing code style and patterns already in use.\n"
         "- Prefer explicit error handling over silent failures.\n"
         "- Run the test suite and linter after every change.\n"
         "- Never push directly to `main`; always open a pull request.\n"
+        "- `.gitignore` has a managed section below the `# local-agent-harness`"
+        " marker — do not hand-edit that section.\n"
         "\n"
         "## Scope Boundary\n\n"
         "| Action | Allowed scope |\n"
@@ -229,13 +236,22 @@ def build_agents_md(repo: Path, info: dict[str, Any]) -> str:
         "| Execute | see `.agent/policies/commands.allowlist` |\n"
         "\n"
         "## Security and Hard Constraints\n\n"
-        "All hard constraints may never be relaxed.\n\n"
+        "All hard constraints are enforced at every stage and may never be relaxed.\n\n"
         "- **HC1** \u2014 No plaintext secrets in repository, prompts, logs, or commits.\n"
         "- **HC2** \u2014 No writes outside the repository working tree.\n"
-        "- **HC3** \u2014 Destructive commands require explicit human approval.\n"
-        "- **HC4** \u2014 Irreversible operations may be authored but never executed by the agent.\n"
-        "- **HC5** \u2014 Network egress denied by default; allowlist documented in `AGENTS.md`.\n"
-        "- **HC6** \u2014 Red-class data (secrets, PII) never enters prompts, tool args, or logs.\n\n"
+        "- **HC3** \u2014 Destructive commands (`rm -rf`, `git push --force`, schema drops,\n"
+        "  package publishes) require explicit human approval.\n"
+        "- **HC4** \u2014 Migrations and irreversible operations may be authored but never\n"
+        "  executed by the agent.\n"
+        "- **HC5** \u2014 Network egress is denied by default; allowlist in `AGENTS.md`.\n"
+        "- **HC6** \u2014 Red-class data (secrets, PII, customer data) never enters prompts,\n"
+        "  tool arguments, or logs.\n\n"
+        "**Data classification:**\n\n"
+        "| Class | Examples | In prompts? | In logs? |\n"
+        "|---|---|---|---|\n"
+        "| Green | OSS source, public docs | yes | yes |\n"
+        "| Amber | Internal source, non-PII configs | yes (redact tokens) | redacted |\n"
+        "| Red | Secrets, PII, customer data, keys | **no** | **no** |\n\n"
         "Use `gitleaks` pre-commit hook. Run the harness validation gate before every PR.\n"
         "\n"
         "## Stop Conditions\n\n"

@@ -228,7 +228,12 @@ def test_render_copilot_includes_project_context_sections(tmp_path: Path) -> Non
         assert section in content, f"Missing section: {section}"
 
 
-def test_render_copilot_includes_detected_commands(tmp_path: Path) -> None:
+def test_render_copilot_no_duplicate_project_commands(tmp_path: Path) -> None:
+    """Project test/lint/build commands must NOT appear in copilot-instructions.md.
+
+    They live in AGENTS.md (§Testing, §Lint and Format) which all runtimes
+    read natively.  Repeating them here would violate the DRY contract.
+    """
     info = _empty_info()
     info["stack"] = ["Python"]
     info["test_cmds"] = ["pytest"]
@@ -238,9 +243,13 @@ def test_render_copilot_includes_detected_commands(tmp_path: Path) -> None:
     ):
         runtime_overlay.render_copilot(tmp_path, dry=False)
     content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    # Tech stack is project context → must appear
     assert "Python" in content
-    assert "pytest" in content
-    assert "ruff check src" in content
+    # Project commands are in AGENTS.md, not here
+    assert "pytest" not in content
+    assert "ruff check src" not in content
+    # File must note that commands are in AGENTS.md
+    assert "AGENTS.md" in content
 
 
 def test_render_copilot_includes_harness_commands(tmp_path: Path) -> None:

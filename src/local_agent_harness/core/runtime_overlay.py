@@ -186,9 +186,11 @@ def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
     https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/
     add-custom-instructions/add-repository-instructions
 
-    This file provides **project context** (what the repo is, how to build/
-    test/validate, where things live) — not behavioral rules (those are in
-    AGENTS.md).
+    DRY note: project build/test/lint commands live in AGENTS.md (§Setup,
+    §Testing, §Lint and Format auto-sections), which all agent runtimes read
+    natively.  This file contains only project context (overview, layout,
+    tech stack) and harness-validation commands that are unique to the
+    Copilot workflow.  Do not repeat project commands here.
     """
     stack_str = (
         ", ".join(info["stack"])
@@ -196,21 +198,8 @@ def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
         else "Not yet determined — update this section when source code is added."
     )
 
-    # Build validation commands block
-    all_cmds: list[str] = []
-    for label, cmds in [
-        ("# Setup", info.get("install_cmds", [])),
-        ("# Build", info.get("build_cmds", [])),
-        ("# Test", info.get("test_cmds", [])),
-        ("# Lint / Format", info.get("lint_cmds", []) + info.get("format_cmds", [])),
-    ]:
-        if cmds:
-            all_cmds.append(label)
-            all_cmds.extend(cmds)
-            all_cmds.append("")
-
-    # Always include harness commands
-    all_cmds += [
+    # Harness validation commands only — project build/test/lint are in AGENTS.md
+    harness_cmds = [
         "# Agent harness",
         "local-agent-harness check --repo .",
         "local-agent-harness validate --repo .",
@@ -219,8 +208,7 @@ def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
         "pre-commit install       # first time only",
         "pre-commit run --all-files",
     ]
-
-    cmds_block = "```bash\n" + "\n".join(all_cmds).rstrip() + "\n```"
+    cmds_block = "```bash\n" + "\n".join(harness_cmds) + "\n```"
 
     layout = _repo_layout_tree(repo)
 
@@ -232,6 +220,9 @@ def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
         "## Project Layout\n\n"
         f"```\n{layout}\n```\n\n"
         "## Build & Validation Commands\n\n"
+        "<!-- Project setup, build, test, and lint commands are in AGENTS.md\n"
+        "     (§Setup, §Testing, §Lint and Format) — read natively by all agent\n"
+        "     runtimes (Claude Code, Codex CLI, Copilot Cloud Agent). -->\n\n"
         f"{cmds_block}\n\n"
         "## Copilot-specific guidance\n\n"
         "<!-- Add Copilot-only supplements here as the project grows\n"
