@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] — 2026-05-08
+
+### Changed
+- `agents_builder.build_agents_md()`: added `## Stop Conditions` section to
+  the shared AGENTS.md spine so every runtime picks it up automatically.
+- `runtime_overlay.py`: removed duplicate `## Stop conditions` blocks from
+  `_COPILOT_INSTRUCTIONS` and `_CODEX_INSTRUCTIONS`; replaced with a
+  comment pointing to the AGENTS.md spine.
+- `diff_manifests.py`: added `"Stop Conditions"` to AGENTS.md drift anchors;
+  removed `"Stop conditions"` from Copilot and Codex overlay anchor lists.
+
+### Added
+- ADR-002: documents the DRY deduplication decision.
+
 ## [0.3.2] — 2026-05-08
 
 ### Fixed
