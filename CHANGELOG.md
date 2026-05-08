@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.7] — 2026-05-09
+
+### Fixed
+- `agents_builder.py` / `AGENTS.md.tmpl`: removed `local-agent-harness
+  validate` command from the Security section — build/validation commands
+  belong in `copilot-instructions.md`, not the behavioral spine. The rule
+  now states the obligation only, pointing to the commands file.
+- `agents_builder.py` / `AGENTS.md.tmpl`: made AGENTS.md fully
+  runtime-agnostic — removed the `copilot-instructions.md` pointer from
+  the Security footer (AGENTS.md must not name a specific runtime's config
+  file); changed `Applies to all runtimes` → `Applies to all agents` in
+  the Stop Conditions section.
+
 ## [0.3.6] — 2026-05-09
 
 ### Added
