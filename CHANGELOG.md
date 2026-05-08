@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] — 2026-05-08
+
+### Changed
+- `agents_builder.py`: expanded `## Conventions` with five shared rules
+  (small functions, match style, explicit error handling, run tests, no
+  direct pushes to `main`) and extended `## PR Checklist` (tests for every
+  new fn/bug fix; call out dependency changes; keep PRs small).
+- `runtime_overlay.py`: removed six shared bullets from
+  `_COPILOT_INSTRUCTIONS`, three shared rules from
+  `_COPILOT_GENERAL_INSTRUCTIONS`, duplicate HC5 line from
+  `_CODEX_INSTRUCTIONS`, and the duplicate out-of-scope stop condition from
+  `_CLAUDE_MD` — all now live in the AGENTS.md spine.
+- Asset templates (`AGENTS.md.tmpl`, `copilot-cli.tmpl`,
+  `codex.config.tmpl`, `CLAUDE.md.tmpl`) synced to match Python source
+  (ADR-002 regression fix).
+
+### Added
+- ADR-003: documents the DRY consolidation of shared conventions and PR
+  checklist items.
+
 ## [0.3.3] — 2026-05-08
 
 ### Changed
