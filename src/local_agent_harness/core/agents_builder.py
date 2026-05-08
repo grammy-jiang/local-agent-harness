@@ -227,7 +227,6 @@ def build_agents_md(repo: Path, info: dict[str, Any]) -> str:
         "| Create | within edit scope |\n"
         "| Delete | requires human approval |\n"
         "| Execute | see `.agent/policies/commands.allowlist` |\n"
-        "| Network | denied by default |\n"
         "\n"
         "## Security and Hard Constraints\n\n"
         "All hard constraints may never be relaxed.\n\n"

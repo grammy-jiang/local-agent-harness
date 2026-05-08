@@ -165,18 +165,19 @@ def test_render_claude_code_settings_valid_json(tmp_path: Path) -> None:
 
 def test_render_copilot_creates_files(tmp_path: Path) -> None:
     msgs = runtime_overlay.render_copilot(tmp_path, dry=False)
-    assert len(msgs) == 2
+    assert len(msgs) == 1
     instructions = tmp_path / ".github" / "copilot-instructions.md"
-    general = tmp_path / ".github" / "instructions" / "general.instructions.md"
     assert instructions.exists()
-    assert general.exists()
     assert "AGENTS.md" in instructions.read_text()
-    assert "applyTo" in general.read_text()
+    # general.instructions.md is NOT generated — Copilot reads AGENTS.md natively
+    general = tmp_path / ".github" / "instructions" / "general.instructions.md"
+    assert not general.exists()
 
 
 def test_render_copilot_dry_run(tmp_path: Path) -> None:
     msgs = runtime_overlay.render_copilot(tmp_path, dry=True)
     assert not (tmp_path / ".github").exists()
+    assert len(msgs) == 1
     assert all("would render:" in m for m in msgs)
 
 
@@ -186,7 +187,7 @@ def test_render_copilot_skips_existing(tmp_path: Path) -> None:
     instr = gh / "copilot-instructions.md"
     instr.write_text("custom")
     msgs = runtime_overlay.render_copilot(tmp_path, dry=False)
-    # First file skipped, second created
+    assert len(msgs) == 1
     assert "skip" in msgs[0]
     assert instr.read_text() == "custom"
 
@@ -240,7 +241,7 @@ def test_render_runtime_claude_code(tmp_path: Path) -> None:
 
 def test_render_runtime_copilot_cli(tmp_path: Path) -> None:
     msgs = runtime_overlay.render_runtime("copilot-cli", tmp_path, dry=True)
-    assert len(msgs) == 2
+    assert len(msgs) == 1
 
 
 def test_render_runtime_codex_cli(tmp_path: Path) -> None:

@@ -64,7 +64,7 @@ _CLAUDE_MD = """\
 - Default mode: `default`  (switch to `plan` for risky changes)
 - Allowed tools: `Read`, `Glob`, `Grep`, `Edit`, `Bash` (allow-listed in
   `.claude/settings.json`)
-- Denied by default: `curl`, `wget`, secrets files, `.env*`
+- Denied tools and paths: see `.claude/settings.json` (authoritative; do not duplicate here)
 - MCP servers: none configured by default — add to `.mcp.json`
 
 ### When to enter Plan mode
@@ -165,31 +165,16 @@ _COPILOT_INSTRUCTIONS = """\
      Add Copilot-only supplements here if needed in future. -->
 """
 
-_COPILOT_GENERAL_INSTRUCTIONS = """\
----
-applyTo: "**"
----
-
-<!-- .github/instructions/general.instructions.md                         -->
-<!-- Path-specific instruction applied to every file in this repository.   -->
-
-Follow the conventions and hard constraints in `AGENTS.md` (repository root)
-for all files.
-<!-- Specific rules (style, testing, error handling, secrets) are defined in AGENTS.md. -->
-"""
-
-
 def render_copilot(repo: Path, dry: bool) -> list[str]:
-    """Create ``.github/copilot-instructions.md`` and a general path instruction."""
+    """Create ``.github/copilot-instructions.md``.
+
+    Copilot reads AGENTS.md natively, so no ``general.instructions.md``
+    pointer is needed — it would only duplicate what AGENTS.md already says.
+    """
     return [
         _write_if_missing(
             repo / ".github" / "copilot-instructions.md",
             _COPILOT_INSTRUCTIONS,
-            dry,
-        ),
-        _write_if_missing(
-            repo / ".github" / "instructions" / "general.instructions.md",
-            _COPILOT_GENERAL_INSTRUCTIONS,
             dry,
         ),
     ]
