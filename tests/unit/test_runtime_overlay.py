@@ -263,6 +263,54 @@ def test_render_copilot_includes_harness_commands(tmp_path: Path) -> None:
     assert "pre-commit" in content
 
 
+def test_render_copilot_no_agents_md_duplicate_notes(tmp_path: Path) -> None:
+    """copilot-instructions.md must not duplicate notes already in AGENTS.md.
+
+    Specifically, the managed-gitignore-section note lives in AGENTS.md
+    (§Conventions) and must NOT appear in copilot-instructions.md.
+    If it did, any 'refresh --apply' using the template would reintroduce
+    the duplication.
+    """
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
+    content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    # This note is owned by AGENTS.md § Conventions — must not be duplicated here
+    assert "local-agent-harness` marker" not in content
+
+
+def test_render_copilot_loading_table_present(tmp_path: Path) -> None:
+    """copilot-instructions.md must include the per-product file-loading table."""
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
+    content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    assert "Which Copilot product reads which files" in content
+    assert "VS Code Copilot Chat" in content
+    assert "Copilot Cloud Agent" in content
+    assert "Copilot CLI" in content
+
+
+def test_render_copilot_vscode_chat_warning_present(tmp_path: Path) -> None:
+    """copilot-instructions.md must warn that VS Code Chat does not load AGENTS.md."""
+    with patch.object(
+        runtime_overlay._agents_builder, "detect_project_info", return_value=_empty_info()
+    ):
+        runtime_overlay.render_copilot(tmp_path, dry=False)
+    content = (tmp_path / ".github" / "copilot-instructions.md").read_text()
+    assert "do not load `AGENTS.md` automatically" in content
+
+
+def test_render_claude_md_copilot_cli_note(tmp_path: Path) -> None:
+    """CLAUDE.md must note that Copilot CLI also reads this file."""
+    runtime_overlay.render_claude_code(tmp_path, dry=False)
+    content = (tmp_path / "CLAUDE.md").read_text()
+    assert "Copilot CLI also reads this file" in content
+    assert "claude-code-only" in content
+
+
 # ---------------------------------------------------------------------------
 # render_codex
 # ---------------------------------------------------------------------------

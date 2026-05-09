@@ -54,11 +54,15 @@ def _write_if_missing(path: Path, content: str, dry: bool) -> str:
 
 # CLAUDE.md uses Claude Code's @path/to/file import syntax so the shared
 # AGENTS.md content is loaded automatically — no duplication required.
+# Note: Copilot CLI also reads CLAUDE.md natively, but the @AGENTS.md
+# directive is Claude Code-specific (Copilot CLI reads AGENTS.md directly).
 _CLAUDE_MD = """\
 # CLAUDE.md — Claude Code project instructions
 
-<!-- DRY: shared build commands, conventions, and scope boundary live in  -->
-<!-- AGENTS.md.  This file imports it and adds Claude Code-only settings. -->
+<!-- Behavioral spine (hard constraints, scope, PR checklist) lives in     -->
+<!-- AGENTS.md.  Claude Code inlines it via @-import below.                -->
+<!-- Copilot CLI also reads this file; it reads AGENTS.md separately and   -->
+<!-- should ignore the claude-code-only section below.                      -->
 
 @AGENTS.md
 
@@ -221,14 +225,26 @@ def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
         f"```\n{layout}\n```\n\n"
         "## Build & Validation Commands\n\n"
         "<!-- Project setup, build, test, and lint commands are in AGENTS.md\n"
-        "     (§Setup, §Testing, §Lint and Format) — read natively by all agent\n"
-        "     runtimes (Claude Code, Codex CLI, Copilot Cloud Agent). -->\n\n"
+        "     (§Setup, §Testing, §Lint and Format) — loaded natively by Copilot\n"
+        "     CLI, Copilot Cloud Agent, Claude Code, and Codex CLI.\n"
+        "     VS Code Chat and Code Review users: see AGENTS.md directly. -->\n\n"
         f"{cmds_block}\n\n"
         "## Copilot-specific guidance\n\n"
-        "<!-- Add Copilot-only supplements here as the project grows\n"
-        "     (e.g., code review focus areas, chat response preferences).\n"
-        "     Behavioral constraints, scope boundaries, stop conditions,\n"
-        "     and PR checklist live in AGENTS.md. -->\n\n"
+        "### Which Copilot product reads which files\n\n"
+        "| Product | Files loaded |\n"
+        "|---|---|\n"
+        "| **Copilot CLI** (terminal agent) | `AGENTS.md`, this file, `CLAUDE.md`,"
+        " `.github/instructions/**/*.instructions.md` |\n"
+        "| **VS Code Copilot Chat** | This file,"
+        " `.github/instructions/**/*.instructions.md` |\n"
+        "| **Copilot Cloud Agent** | `AGENTS.md`, this file |\n"
+        "| **Copilot Code Review** | This file |\n\n"
+        "> **VS Code Chat and Code Review** do not load `AGENTS.md` automatically.\n"
+        "> Review `AGENTS.md` for hard constraints (HC1–HC6), scope boundary,\n"
+        "> stop conditions, and PR checklist before using Copilot in this repo.\n\n"
+        "<!-- Add Copilot-only supplements below as the project grows\n"
+        "     (e.g., code review focus areas, path-specific notes via\n"
+        "     .github/instructions/*.instructions.md with applyTo: frontmatter). -->\n\n"
         "## Notes\n\n"
         "- `.agent/eval/` is gitignored; readiness reports are local only.\n"
     )

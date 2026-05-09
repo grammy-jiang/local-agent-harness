@@ -19,8 +19,9 @@ _Languages, frameworks, runtimes — e.g., Python 3.12, FastAPI, Node.js 20_
 ## Build & Validation Commands
 
 <!-- Project setup, build, test, and lint commands are in AGENTS.md
-     (§Setup, §Testing, §Lint and Format) — read natively by all agent
-     runtimes (Claude Code, Codex CLI, Copilot Cloud Agent). -->
+     (§Setup, §Testing, §Lint and Format) — loaded natively by Copilot
+     CLI, Copilot Cloud Agent, Claude Code, and Codex CLI.
+     VS Code Chat and Code Review users: see AGENTS.md directly. -->
 
 ```bash
 # Agent harness
@@ -34,13 +35,23 @@ pre-commit run --all-files
 
 ## Copilot-specific guidance
 
-<!-- Add Copilot-only supplements here as the project grows
-     (e.g., code review focus areas, chat response preferences).
-     Behavioral constraints, scope boundaries, stop conditions,
-     and PR checklist live in AGENTS.md. -->
+### Which Copilot product reads which files
+
+| Product | Files loaded |
+|---|---|
+| **Copilot CLI** (terminal agent) | `AGENTS.md`, this file, `CLAUDE.md`, `.github/instructions/**/*.instructions.md` |
+| **VS Code Copilot Chat** | This file, `.github/instructions/**/*.instructions.md` |
+| **Copilot Cloud Agent** | `AGENTS.md`, this file |
+| **Copilot Code Review** | This file |
+
+> **VS Code Chat and Code Review** do not load `AGENTS.md` automatically.
+> Review `AGENTS.md` for hard constraints (HC1–HC6), scope boundary,
+> stop conditions, and PR checklist before using Copilot in this repo.
+
+<!-- Add Copilot-only supplements below as the project grows
+     (e.g., code review focus areas, path-specific notes via
+     .github/instructions/*.instructions.md with applyTo: frontmatter). -->
 
 ## Notes
 
 - `.agent/eval/` is gitignored; readiness reports are local only.
-- `.gitignore` is managed by `local-agent-harness`; do not hand-edit
-  the section below the `# local-agent-harness` marker.
