@@ -231,8 +231,6 @@ def _build_copilot_instructions(repo: Path, info: dict[str, Any]) -> str:
         "     and PR checklist live in AGENTS.md. -->\n\n"
         "## Notes\n\n"
         "- `.agent/eval/` is gitignored; readiness reports are local only.\n"
-        "- `.gitignore` is managed by `local-agent-harness`; do not hand-edit\n"
-        "  the section below the `# local-agent-harness` marker.\n"
     )
 
 
