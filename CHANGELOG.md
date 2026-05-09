@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.12] — 2026-05-09
+
+### Fixed
+- `runtime_overlay.py` / `copilot-cli.tmpl`: added a product-to-files
+  table in the generated `copilot-instructions.md` so VS Code Chat and
+  Copilot Code Review users know they must consult `AGENTS.md` directly
+  (those products do not load it automatically).
+- `runtime_overlay.py` / `CLAUDE.md.tmpl`: clarified the `CLAUDE.md`
+  header — the `@AGENTS.md` import is Claude Code-specific; Copilot CLI
+  reads `AGENTS.md` separately.
+
 ## [0.3.11] — 2026-05-09
 
 ### Fixed
