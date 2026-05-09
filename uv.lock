@@ -262,7 +262,7 @@ wheels = [
 
 [[package]]
 name = "local-agent-harness"
-version = "0.3.8"
+version = "0.3.10"
 source = { editable = "." }
 dependencies = [
     { name = "typer" },
